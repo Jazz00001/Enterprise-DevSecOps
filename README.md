@@ -856,15 +856,7 @@ This lab demonstrates practical knowledge of:
 
 ---
 
-# 🎤 Interview Talking Points
 
-## 30-Second Pitch
-
-> I built an enterprise DevSecOps Red Team lab that simulates a cloud-native banking API moving through CI/CD, Docker, Kubernetes, and GitOps. I intentionally introduced risks such as hardcoded secrets, broken API authorization, insecure Dockerfiles, privileged Kubernetes workloads, unsigned image deployment, and Terraform state exposure. I then validated those risks using tools like Semgrep, Gitleaks, Trivy, Syft, Kyverno, and Kubernetes, hardened the environment, retested the fixes, and documented everything using PTaaS-style finding cards, compliance mapping, risk register, and a professional retest report.
-
-## 2-Minute Technical Explanation
-
-> The project starts with a vulnerable FastAPI banking API. I assessed it for API security issues such as broken object-level authorization, insecure file upload validation, and hardcoded JWT secrets. Then I added CI/CD security controls using GitHub Actions and GitLab CI templates with Semgrep, Gitleaks, and Trivy. I built both insecure and secure Docker images to show container hardening. For supply-chain security, I documented SBOM generation and image signing concepts. Then I deployed the workload into Kubernetes and demonstrated how insecure manifests, privileged containers, missing resource limits, and broad GitOps permissions can create real risk. Finally, I applied Kyverno policies and secure manifests, retested the environment, and created executive, technical, compliance, and PTaaS-style reports.
 
 ## What Makes This Project Different
 
