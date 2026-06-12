@@ -21,13 +21,6 @@
   <img src="https://img.shields.io/badge/Ethics-Authorized%20Lab-red?style=for-the-badge" />
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/github/stars/Jazz00001/Enterprise-DevSecOps-Redteam-Lab?style=social" />
-  <img src="https://img.shields.io/github/forks/Jazz00001/Enterprise-DevSecOps-Redteam-Lab?style=social" />
-  <img src="https://img.shields.io/github/last-commit/Jazz00001/Enterprise-DevSecOps-Redteam-Lab?style=flat-square" />
-  <img src="https://img.shields.io/github/repo-size/Jazz00001/Enterprise-DevSecOps-Redteam-Lab?style=flat-square" />
-  <img src="https://img.shields.io/github/languages/top/Jazz00001/Enterprise-DevSecOps-Redteam-Lab?style=flat-square" />
-</p>
 
 <p align="center">
   <img src="https://skillicons.dev/icons?i=python,fastapi,docker,kubernetes,githubactions,gitlab,bash,linux,terraform,aws,git,github" />
