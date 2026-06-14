@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.db
+.env
+.DS_Store
+
+k9s
+k9s.tar.gz
+kubectl
+get_helm.sh
+
+*.log

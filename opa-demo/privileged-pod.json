@@ -1,0 +1,23 @@
+{
+  "request": {
+    "kind": {
+      "kind": "Pod"
+    },
+    "object": {
+      "metadata": {
+        "name": "privileged-pod"
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "bad",
+            "image": "nginx",
+            "securityContext": {
+              "privileged": true
+            }
+          }
+        ]
+      }
+    }
+  }
+}

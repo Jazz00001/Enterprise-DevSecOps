@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: insecure-devsecops-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: insecure-devsecops-app
+  template:
+    metadata:
+      labels:
+        app: insecure-devsecops-app
+    spec:
+      containers:
+        - name: app
+          image: devsecops-vuln-app:lab
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          resources: {}
