@@ -1,0 +1,14 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: devsecops-lab
+
+networking:
+  disableDefaultCNI: true
+  podSubnet: "192.168.0.0/16"
+
+nodes:
+- role: control-plane
+  extraPortMappings:
+  - containerPort: 30080
+    hostPort: 8080
+    protocol: TCP

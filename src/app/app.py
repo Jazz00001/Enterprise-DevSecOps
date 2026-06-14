@@ -32,7 +32,7 @@ def home():
 def get_user():
     user_id = request.args.get("id", "1")
 
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
     cursor = conn.cursor()
 
     query = f"SELECT id, username, role FROM users WHERE id = '{user_id}'"

@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: demo-app-sa
+  namespace: devsecops
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: demo-app-role
+  namespace: devsecops
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: demo-app-rolebinding
+  namespace: devsecops
+subjects:
+- kind: ServiceAccount
+  name: demo-app-sa
+  namespace: devsecops
+roleRef:
+  kind: Role
+  name: demo-app-role
+  apiGroup: rbac.authorization.k8s.io

@@ -1,3 +1,4 @@
+# Stage 1: Build Python dependencies
 FROM python:3.11-slim AS builder
 
 WORKDIR /app
@@ -7,6 +8,7 @@ COPY src/app/requirements.txt .
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 
+# Stage 2: Runtime image
 FROM python:3.11-slim AS runtime
 
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -15,17 +17,18 @@ ENV PATH="/usr/local/bin:$PATH"
 
 WORKDIR /app
 
-RUN groupadd -r appgroup && \
-    useradd -r -g appgroup -u 10001 appuser
+RUN groupadd -g 10001 appgroup && \
+    useradd -u 10001 -g 10001 -r -s /usr/sbin/nologin appuser
 
 COPY --from=builder /install /usr/local
 
 COPY src/app/ .
 
 RUN python init_db.py && \
-    chown -R appuser:appgroup /app
+    chown -R 10001:10001 /app && \
+    chmod -R a=rX /app
 
-USER appuser
+USER 10001:10001
 
 EXPOSE 5000
 
