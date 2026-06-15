@@ -5,6 +5,9 @@ metadata:
   namespace: devsecops
   labels:
     app: demo-app
+    security-owner: jazz
+    sbom: syft
+    signed: cosign
 spec:
   replicas: 1
   selector:
@@ -14,6 +17,9 @@ spec:
     metadata:
       labels:
         app: demo-app
+        security-owner: jazz
+        sbom: syft
+        signed: cosign
     spec:
       serviceAccountName: demo-app-sa
       automountServiceAccountToken: false

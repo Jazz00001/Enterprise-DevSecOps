@@ -1,0 +1,16 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredLabels
+metadata:
+  name: deployments-must-have-supply-chain-labels
+spec:
+  match:
+    kinds:
+    - apiGroups: ["apps"]
+      kinds: ["Deployment"]
+    namespaces:
+    - devsecops
+  parameters:
+    labels:
+    - security-owner
+    - sbom
+    - signed

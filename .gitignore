@@ -12,3 +12,10 @@ kubectl
 get_helm.sh
 
 *.log
+
+# Supply chain secrets
+security/cosign/cosign.key
+cosign.key
+*.pem
+*.key
+.env

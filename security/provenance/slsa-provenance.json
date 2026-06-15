@@ -1,0 +1,29 @@
+{
+  "buildDefinition": {
+    "buildType": "https://example.com/private-vm/docker-build",
+    "externalParameters": {
+      "repository": "https://github.com/Jazz00001/Enterprise-DevSecOps",
+      "ref": "refs/heads/main",
+      "image": "ghcr.io/jazz00001/enterprise-devsecops:latest",
+      "imageDigest": "sha256:14776e0fe1b95a6aab7a76d5715613d359a0e92be22716b44c1f7514bc720764"
+    },
+    "resolvedDependencies": [
+      {
+        "uri": "git+https://github.com/Jazz00001/Enterprise-DevSecOps",
+        "digest": {
+          "gitCommit": "0478cbcb3a57e9afc07f9b91d9b0e9b7f9ca3b8b"
+        }
+      }
+    ]
+  },
+  "runDetails": {
+    "builder": {
+      "id": "private-ubuntu-endpoint-vm"
+    },
+    "metadata": {
+      "invocationId": "local-lab-0478cbcb3a57e9afc07f9b91d9b0e9b7f9ca3b8b",
+      "startedOn": "2026-06-15T13:26:55Z",
+      "finishedOn": "2026-06-15T13:26:59Z"
+    }
+  }
+}
