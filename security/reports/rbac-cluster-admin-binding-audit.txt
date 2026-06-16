@@ -1,0 +1,3 @@
+cluster-admin	Group:-:system:masters
+kubeadm:cluster-admins	Group:-:kubeadm:cluster-admins
+pwned-overprivileged-sa	ServiceAccount:rbac-lab:overprivileged-sa
