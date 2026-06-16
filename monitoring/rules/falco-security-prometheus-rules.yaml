@@ -1,0 +1,45 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: falco-security-rules
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+  - name: falco.security.rules
+    rules:
+    - alert: FalcoRuntimeDetection
+      expr: |
+        sum by (rule_name, priority, source) (
+          increase(falcosecurity_falco_rules_matches_total[5m])
+        ) > 0
+      for: 0m
+      labels:
+        severity: warning
+        category: runtime-security
+      annotations:
+        summary: "Falco runtime detection triggered"
+        description: "Falco rule {{ $labels.rule_name }} triggered with priority {{ $labels.priority }} from source {{ $labels.source }}."
+
+    - alert: FalcoKernelEventDrops
+      expr: |
+        sum(increase(falcosecurity_scap_n_drops_total[5m])) > 0
+      for: 1m
+      labels:
+        severity: critical
+        category: runtime-security
+      annotations:
+        summary: "Falco kernel event drops detected"
+        description: "Falco is dropping kernel events. Detection quality may be affected."
+
+    - alert: FalcoOutputQueueDrops
+      expr: |
+        sum(increase(falcosecurity_falco_outputs_queue_num_drops_total[5m])) > 0
+      for: 1m
+      labels:
+        severity: critical
+        category: runtime-security
+      annotations:
+        summary: "Falco output queue drops detected"
+        description: "Falco output queue is dropping events."

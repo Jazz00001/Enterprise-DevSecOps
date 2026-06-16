@@ -1,0 +1,124 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []},
+      "gridPos": {"h": 6, "w": 6, "x": 0, "y": 0},
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "sum(increase(falcosecurity_falco_rules_matches_total[10m]))",
+          "legendFormat": "Falco detections",
+          "refId": "A"
+        }
+      ],
+      "title": "Falco Detections - Last 10m",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []},
+      "gridPos": {"h": 6, "w": 9, "x": 6, "y": 0},
+      "id": 2,
+      "options": {
+        "legend": {"displayMode": "table", "placement": "right"},
+        "tooltip": {"mode": "single"}
+      },
+      "targets": [
+        {
+          "expr": "sum by (priority) (increase(falcosecurity_falco_rules_matches_total[30m]))",
+          "legendFormat": "priority {{priority}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Falco Events by Priority",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 9, "x": 15, "y": 0},
+      "id": 3,
+      "options": {"showHeader": true},
+      "targets": [
+        {
+          "expr": "topk(10, sum by (rule_name) (increase(falcosecurity_falco_rules_matches_total[1h])))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{rule_name}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Top Falco Rules Triggered - Last 1h",
+      "type": "table"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []},
+      "gridPos": {"h": 7, "w": 12, "x": 0, "y": 8},
+      "id": 4,
+      "options": {
+        "legend": {"displayMode": "list", "placement": "bottom"},
+        "tooltip": {"mode": "single"}
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(falcosecurity_scap_n_evts_total[5m]))",
+          "legendFormat": "syscall event rate",
+          "refId": "A"
+        }
+      ],
+      "title": "Falco Kernel Event Processing Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []},
+      "gridPos": {"h": 7, "w": 12, "x": 12, "y": 8},
+      "id": 5,
+      "options": {
+        "legend": {"displayMode": "list", "placement": "bottom"},
+        "tooltip": {"mode": "single"}
+      },
+      "targets": [
+        {
+          "expr": "sum(increase(falcosecurity_scap_n_drops_total[10m]))",
+          "legendFormat": "kernel event drops",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(increase(falcosecurity_falco_outputs_queue_num_drops_total[10m]))",
+          "legendFormat": "output queue drops",
+          "refId": "B"
+        }
+      ],
+      "title": "Falco Dropped Events / Output Drops",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["falco", "security", "runtime", "devsecops"],
+  "templating": {"list": []},
+  "time": {"from": "now-1h", "to": "now"},
+  "timezone": "",
+  "title": "Falco Runtime Security Dashboard",
+  "uid": "falco-runtime-security",
+  "version": 1,
+  "weekStart": ""
+}

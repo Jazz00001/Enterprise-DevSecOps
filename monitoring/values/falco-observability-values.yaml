@@ -1,0 +1,35 @@
+tty: true
+
+driver:
+  kind: modern_ebpf
+
+metrics:
+  enabled: true
+  interval: 30s
+  outputRule: true
+  rulesCountersEnabled: true
+  resourceUtilizationEnabled: true
+  stateCountersEnabled: true
+  kernelEventCountersEnabled: true
+  convertMemoryToMB: true
+
+serviceMonitor:
+  create: true
+  labels:
+    release: monitoring
+  interval: 30s
+  scrapeTimeout: 10s
+
+falcosidekick:
+  enabled: true
+  replicaCount: 1
+
+  serviceMonitor:
+    enabled: true
+    additionalLabels:
+      release: monitoring
+    interval: 30s
+
+  webui:
+    enabled: true
+    replicaCount: 1
