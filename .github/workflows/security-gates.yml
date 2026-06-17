@@ -1,0 +1,651 @@
+name: Security Gates
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      enforce_gates:
+        description: "Fail the workflow when a gate exceeds its threshold"
+        required: true
+        default: true
+        type: boolean
+  schedule:
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+  actions: read
+  security-events: write
+
+concurrency:
+  group: security-gates-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.11"
+  APP_PATH: "src/app"
+  REQUIREMENTS_FILE: "src/app/requirements.txt"
+  K8S_MANIFEST_PATH: "k8s/base"
+  IMAGE_NAME: "enterprise-devsecops-lab"
+
+  # Blocking thresholds. Tune these after remediation is completed.
+  MAX_BANDIT_HIGH: "0"
+  MAX_BANDIT_MEDIUM: "0"
+  MAX_PIP_AUDIT_TOTAL: "0"
+  MAX_TRIVY_CRITICAL: "0"
+  MAX_TRIVY_HIGH: "5"
+
+jobs:
+  sast-bandit:
+    name: SAST Gate - Bandit
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install Bandit
+        run: |
+          python -m pip install --upgrade pip
+          pip install "bandit[toml,sarif]"
+
+      - name: Run Bandit SAST scan
+        run: |
+          mkdir -p security/reports gate-results
+          bandit -r "${APP_PATH}" -f json -o security/reports/bandit-report.json || true
+          bandit -r "${APP_PATH}" -f txt -o security/reports/bandit-report.txt || true
+          bandit -r "${APP_PATH}" -f sarif -o security/reports/bandit-report.sarif || true
+
+      - name: Parse Bandit gate result
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = Path("security/reports/bandit-report.json")
+          data = json.loads(report.read_text()) if report.exists() else {"results": []}
+          issues = data.get("results", [])
+          counts = {"HIGH": 0, "MEDIUM": 0, "LOW": 0, "UNKNOWN": 0}
+
+          for issue in issues:
+              sev = str(issue.get("issue_severity", "UNKNOWN")).upper()
+              counts[sev if sev in counts else "UNKNOWN"] += 1
+
+          result = {
+              "tool": "Bandit",
+              "gate": "SAST",
+              "high": counts["HIGH"],
+              "medium": counts["MEDIUM"],
+              "low": counts["LOW"],
+              "total": len(issues),
+              "thresholds": {
+                  "max_high": int("${{ env.MAX_BANDIT_HIGH }}"),
+                  "max_medium": int("${{ env.MAX_BANDIT_MEDIUM }}")
+              },
+              "status": "pass" if counts["HIGH"] <= int("${{ env.MAX_BANDIT_HIGH }}") and counts["MEDIUM"] <= int("${{ env.MAX_BANDIT_MEDIUM }}") else "fail"
+          }
+
+          Path("gate-results/bandit-gate-result.json").write_text(json.dumps(result, indent=2))
+
+          with open("gate-results/bandit-summary.md", "w") as f:
+              f.write("## Bandit SAST Gate\n\n")
+              f.write(f"- High findings: {result['high']}\n")
+              f.write(f"- Medium findings: {result['medium']}\n")
+              f.write(f"- Low findings: {result['low']}\n")
+              f.write(f"- Gate status: **{result['status'].upper()}**\n")
+          PY
+
+          cat gate-results/bandit-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Bandit reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-security-gate-reports
+          path: |
+            security/reports/bandit-report.json
+            security/reports/bandit-report.txt
+            security/reports/bandit-report.sarif
+            gate-results/bandit-gate-result.json
+            gate-results/bandit-summary.md
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload Bandit SARIF to GitHub Code Scanning
+        if: always() && hashFiles('security/reports/bandit-report.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v4
+        continue-on-error: true
+        with:
+          sarif_file: security/reports/bandit-report.sarif
+          category: bandit-sast
+
+      - name: Enforce Bandit gate
+        run: |
+          ENFORCE_GATES="true"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENFORCE_GATES="${{ github.event.inputs.enforce_gates }}"
+          fi
+
+          STATUS=$(python -c 'import json; print(json.load(open("gate-results/bandit-gate-result.json"))["status"])')
+          if [ "$ENFORCE_GATES" = "true" ] && [ "$STATUS" = "fail" ]; then
+            echo "Bandit gate failed. Review security/reports/bandit-report.txt."
+            exit 1
+          fi
+
+  sca-pip-audit:
+    name: SCA Gate - pip-audit
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install pip-audit
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-audit
+
+      - name: Run dependency vulnerability scan
+        run: |
+          mkdir -p security/reports gate-results
+          pip-audit -r "${REQUIREMENTS_FILE}" -f json -o security/reports/pip-audit-report.json || true
+          pip-audit -r "${REQUIREMENTS_FILE}" > security/reports/pip-audit-report.txt || true
+
+      - name: Parse pip-audit gate result
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = Path("security/reports/pip-audit-report.json")
+          data = json.loads(report.read_text()) if report.exists() else {"dependencies": []}
+          deps = data.get("dependencies", [])
+          vulns = []
+
+          for dep in deps:
+              for vuln in dep.get("vulns", []):
+                  vulns.append({
+                      "package": dep.get("name"),
+                      "installed_version": dep.get("version"),
+                      "vulnerability_id": vuln.get("id"),
+                      "fix_versions": vuln.get("fix_versions", [])
+                  })
+
+          total = len(vulns)
+          result = {
+              "tool": "pip-audit",
+              "gate": "SCA",
+              "total_vulnerabilities": total,
+              "affected_packages": sorted(set(v["package"] for v in vulns if v.get("package"))),
+              "thresholds": {"max_total": int("${{ env.MAX_PIP_AUDIT_TOTAL }}")},
+              "status": "pass" if total <= int("${{ env.MAX_PIP_AUDIT_TOTAL }}") else "fail"
+          }
+
+          Path("gate-results/pip-audit-gate-result.json").write_text(json.dumps(result, indent=2))
+
+          with open("gate-results/pip-audit-summary.md", "w") as f:
+              f.write("## pip-audit Dependency Gate\n\n")
+              f.write(f"- Total dependency vulnerabilities: {total}\n")
+              f.write(f"- Affected packages: {', '.join(result['affected_packages']) if result['affected_packages'] else 'None'}\n")
+              f.write(f"- Gate status: **{result['status'].upper()}**\n")
+          PY
+
+          cat gate-results/pip-audit-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload pip-audit reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pip-audit-security-gate-reports
+          path: |
+            security/reports/pip-audit-report.json
+            security/reports/pip-audit-report.txt
+            gate-results/pip-audit-gate-result.json
+            gate-results/pip-audit-summary.md
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Enforce pip-audit gate
+        run: |
+          ENFORCE_GATES="true"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENFORCE_GATES="${{ github.event.inputs.enforce_gates }}"
+          fi
+
+          STATUS=$(python -c 'import json; print(json.load(open("gate-results/pip-audit-gate-result.json"))["status"])')
+          if [ "$ENFORCE_GATES" = "true" ] && [ "$STATUS" = "fail" ]; then
+            echo "pip-audit gate failed. Review security/reports/pip-audit-report.txt."
+            exit 1
+          fi
+
+  trivy-filesystem:
+    name: Repository Gate - Trivy FS, Secrets, Misconfigurations
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Prepare report directories
+        run: mkdir -p security/reports gate-results
+
+      - name: Run Trivy filesystem scan - JSON
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          severity: CRITICAL,HIGH,MEDIUM
+          ignore-unfixed: true
+          format: json
+          output: security/reports/trivy-fs-report.json
+          exit-code: "0"
+
+      - name: Run Trivy filesystem scan - SARIF
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          format: sarif
+          output: security/reports/trivy-fs-results.sarif
+          exit-code: "0"
+
+      - name: Parse Trivy filesystem gate result
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = Path("security/reports/trivy-fs-report.json")
+          data = json.loads(report.read_text()) if report.exists() else {"Results": []}
+          counts = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0, "UNKNOWN": 0}
+
+          for result in data.get("Results", []):
+              items = []
+              items += result.get("Vulnerabilities", []) or []
+              items += result.get("Misconfigurations", []) or []
+              items += result.get("Secrets", []) or []
+              for item in items:
+                  sev = str(item.get("Severity", "UNKNOWN")).upper()
+                  counts[sev if sev in counts else "UNKNOWN"] += 1
+
+          status = "pass" if counts["CRITICAL"] <= int("${{ env.MAX_TRIVY_CRITICAL }}") and counts["HIGH"] <= int("${{ env.MAX_TRIVY_HIGH }}") else "fail"
+          result = {
+              "tool": "Trivy",
+              "gate": "Filesystem/Secret/Misconfiguration",
+              "critical": counts["CRITICAL"],
+              "high": counts["HIGH"],
+              "medium": counts["MEDIUM"],
+              "thresholds": {
+                  "max_critical": int("${{ env.MAX_TRIVY_CRITICAL }}"),
+                  "max_high": int("${{ env.MAX_TRIVY_HIGH }}")
+              },
+              "status": status
+          }
+
+          Path("gate-results/trivy-fs-gate-result.json").write_text(json.dumps(result, indent=2))
+
+          with open("gate-results/trivy-fs-summary.md", "w") as f:
+              f.write("## Trivy Filesystem Gate\n\n")
+              f.write(f"- Critical findings: {counts['CRITICAL']}\n")
+              f.write(f"- High findings: {counts['HIGH']}\n")
+              f.write(f"- Medium findings: {counts['MEDIUM']}\n")
+              f.write(f"- Gate status: **{status.upper()}**\n")
+          PY
+
+          cat gate-results/trivy-fs-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Trivy filesystem SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        continue-on-error: true
+        with:
+          sarif_file: security/reports/trivy-fs-results.sarif
+          category: trivy-filesystem
+
+      - name: Upload Trivy filesystem reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-filesystem-security-gate-reports
+          path: |
+            security/reports/trivy-fs-report.json
+            security/reports/trivy-fs-results.sarif
+            gate-results/trivy-fs-gate-result.json
+            gate-results/trivy-fs-summary.md
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Enforce Trivy filesystem gate
+        run: |
+          ENFORCE_GATES="true"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENFORCE_GATES="${{ github.event.inputs.enforce_gates }}"
+          fi
+
+          STATUS=$(python -c 'import json; print(json.load(open("gate-results/trivy-fs-gate-result.json"))["status"])')
+          if [ "$ENFORCE_GATES" = "true" ] && [ "$STATUS" = "fail" ]; then
+            echo "Trivy filesystem gate failed. Review security/reports/trivy-fs-report.json."
+            exit 1
+          fi
+
+  trivy-config:
+    name: Kubernetes/IaC Gate - Trivy Config
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Prepare report directories
+        run: mkdir -p security/reports gate-results
+
+      - name: Run Trivy config scan - JSON
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: config
+          scan-ref: ${{ env.K8S_MANIFEST_PATH }}
+          severity: CRITICAL,HIGH,MEDIUM
+          format: json
+          output: security/reports/trivy-config-report.json
+          exit-code: "0"
+
+      - name: Run Trivy config scan - SARIF
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: config
+          scan-ref: ${{ env.K8S_MANIFEST_PATH }}
+          severity: CRITICAL,HIGH
+          format: sarif
+          output: security/reports/trivy-config-results.sarif
+          exit-code: "0"
+
+      - name: Parse Trivy config gate result
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = Path("security/reports/trivy-config-report.json")
+          data = json.loads(report.read_text()) if report.exists() else {"Results": []}
+          counts = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0, "UNKNOWN": 0}
+
+          for result in data.get("Results", []):
+              for item in result.get("Misconfigurations", []) or []:
+                  sev = str(item.get("Severity", "UNKNOWN")).upper()
+                  counts[sev if sev in counts else "UNKNOWN"] += 1
+
+          status = "pass" if counts["CRITICAL"] <= int("${{ env.MAX_TRIVY_CRITICAL }}") and counts["HIGH"] <= int("${{ env.MAX_TRIVY_HIGH }}") else "fail"
+          result = {
+              "tool": "Trivy",
+              "gate": "Kubernetes/IaC Misconfiguration",
+              "critical": counts["CRITICAL"],
+              "high": counts["HIGH"],
+              "medium": counts["MEDIUM"],
+              "thresholds": {
+                  "max_critical": int("${{ env.MAX_TRIVY_CRITICAL }}"),
+                  "max_high": int("${{ env.MAX_TRIVY_HIGH }}")
+              },
+              "status": status
+          }
+
+          Path("gate-results/trivy-config-gate-result.json").write_text(json.dumps(result, indent=2))
+
+          with open("gate-results/trivy-config-summary.md", "w") as f:
+              f.write("## Trivy Kubernetes/IaC Gate\n\n")
+              f.write(f"- Critical misconfigurations: {counts['CRITICAL']}\n")
+              f.write(f"- High misconfigurations: {counts['HIGH']}\n")
+              f.write(f"- Medium misconfigurations: {counts['MEDIUM']}\n")
+              f.write(f"- Gate status: **{status.upper()}**\n")
+          PY
+
+          cat gate-results/trivy-config-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Trivy config SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        continue-on-error: true
+        with:
+          sarif_file: security/reports/trivy-config-results.sarif
+          category: trivy-kubernetes-config
+
+      - name: Upload Trivy config reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-config-security-gate-reports
+          path: |
+            security/reports/trivy-config-report.json
+            security/reports/trivy-config-results.sarif
+            gate-results/trivy-config-gate-result.json
+            gate-results/trivy-config-summary.md
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Enforce Trivy config gate
+        run: |
+          ENFORCE_GATES="true"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENFORCE_GATES="${{ github.event.inputs.enforce_gates }}"
+          fi
+
+          STATUS=$(python -c 'import json; print(json.load(open("gate-results/trivy-config-gate-result.json"))["status"])')
+          if [ "$ENFORCE_GATES" = "true" ] && [ "$STATUS" = "fail" ]; then
+            echo "Trivy Kubernetes/IaC gate failed. Review security/reports/trivy-config-report.json."
+            exit 1
+          fi
+
+  trivy-image:
+    name: Container Image Gate - Docker Build and Trivy Image Scan
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Prepare report directories
+        run: mkdir -p security/reports gate-results
+
+      - name: Build local Docker image
+        run: |
+          docker build -t "${IMAGE_NAME}:${GITHUB_SHA}" .
+
+      - name: Run Trivy image scan - JSON
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          severity: CRITICAL,HIGH,MEDIUM
+          ignore-unfixed: true
+          format: json
+          output: security/reports/trivy-image-report.json
+          exit-code: "0"
+
+      - name: Run Trivy image scan - SARIF
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          format: sarif
+          output: security/reports/trivy-image-results.sarif
+          exit-code: "0"
+
+      - name: Parse Trivy image gate result
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = Path("security/reports/trivy-image-report.json")
+          data = json.loads(report.read_text()) if report.exists() else {"Results": []}
+          counts = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0, "UNKNOWN": 0}
+
+          for result in data.get("Results", []):
+              for item in result.get("Vulnerabilities", []) or []:
+                  sev = str(item.get("Severity", "UNKNOWN")).upper()
+                  counts[sev if sev in counts else "UNKNOWN"] += 1
+
+          status = "pass" if counts["CRITICAL"] <= int("${{ env.MAX_TRIVY_CRITICAL }}") and counts["HIGH"] <= int("${{ env.MAX_TRIVY_HIGH }}") else "fail"
+          result = {
+              "tool": "Trivy",
+              "gate": "Container Image Vulnerability",
+              "critical": counts["CRITICAL"],
+              "high": counts["HIGH"],
+              "medium": counts["MEDIUM"],
+              "thresholds": {
+                  "max_critical": int("${{ env.MAX_TRIVY_CRITICAL }}"),
+                  "max_high": int("${{ env.MAX_TRIVY_HIGH }}")
+              },
+              "status": status
+          }
+
+          Path("gate-results/trivy-image-gate-result.json").write_text(json.dumps(result, indent=2))
+
+          with open("gate-results/trivy-image-summary.md", "w") as f:
+              f.write("## Trivy Container Image Gate\n\n")
+              f.write(f"- Critical vulnerabilities: {counts['CRITICAL']}\n")
+              f.write(f"- High vulnerabilities: {counts['HIGH']}\n")
+              f.write(f"- Medium vulnerabilities: {counts['MEDIUM']}\n")
+              f.write(f"- Gate status: **{status.upper()}**\n")
+          PY
+
+          cat gate-results/trivy-image-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Trivy image SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        continue-on-error: true
+        with:
+          sarif_file: security/reports/trivy-image-results.sarif
+          category: trivy-container-image
+
+      - name: Upload Trivy image reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-image-security-gate-reports
+          path: |
+            security/reports/trivy-image-report.json
+            security/reports/trivy-image-results.sarif
+            gate-results/trivy-image-gate-result.json
+            gate-results/trivy-image-summary.md
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Enforce Trivy image gate
+        run: |
+          ENFORCE_GATES="true"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENFORCE_GATES="${{ github.event.inputs.enforce_gates }}"
+          fi
+
+          STATUS=$(python -c 'import json; print(json.load(open("gate-results/trivy-image-gate-result.json"))["status"])')
+          if [ "$ENFORCE_GATES" = "true" ] && [ "$STATUS" = "fail" ]; then
+            echo "Trivy image gate failed. Review security/reports/trivy-image-report.json."
+            exit 1
+          fi
+
+  gate-summary:
+    name: Security Gate Summary
+    runs-on: ubuntu-24.04
+    needs:
+      - sast-bandit
+      - sca-pip-audit
+      - trivy-filesystem
+      - trivy-config
+      - trivy-image
+    if: always()
+
+    steps:
+      - name: Download all security gate artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: collected-security-gate-artifacts
+          merge-multiple: true
+
+      - name: Build final security gate summary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          results = []
+          for path in Path("collected-security-gate-artifacts").rglob("*gate-result.json"):
+              try:
+                  results.append(json.loads(path.read_text()))
+              except Exception as exc:
+                  results.append({"tool": str(path), "gate": "unknown", "status": f"parse-error: {exc}"})
+
+          lines = ["# Security Gates Summary", ""]
+          lines.append("| Gate | Tool | Status | Key Result |")
+          lines.append("|---|---|---|---|")
+
+          for item in sorted(results, key=lambda x: x.get("gate", "")):
+              gate = item.get("gate", "Unknown")
+              tool = item.get("tool", "Unknown")
+              status = str(item.get("status", "unknown")).upper()
+              if "total_vulnerabilities" in item:
+                  key = f"{item['total_vulnerabilities']} dependency vulnerabilities"
+              elif "critical" in item or "high" in item:
+                  key = f"Critical={item.get('critical', 0)}, High={item.get('high', 0)}, Medium={item.get('medium', 0)}"
+              else:
+                  key = f"High={item.get('high', 0)}, Medium={item.get('medium', 0)}, Total={item.get('total', 0)}"
+              lines.append(f"| {gate} | {tool} | {status} | {key} |")
+
+          Path("security-gates-final-summary.md").write_text("\n".join(lines) + "\n")
+          print("\n".join(lines))
+          PY
+
+          cat security-gates-final-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload final gate summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-gates-final-summary
+          path: security-gates-final-summary.md
+          retention-days: 30
+
+      - name: Reflect failed gate jobs in final status
+        run: |
+          echo "Bandit job: ${{ needs.sast-bandit.result }}"
+          echo "pip-audit job: ${{ needs.sca-pip-audit.result }}"
+          echo "Trivy filesystem job: ${{ needs.trivy-filesystem.result }}"
+          echo "Trivy config job: ${{ needs.trivy-config.result }}"
+          echo "Trivy image job: ${{ needs.trivy-image.result }}"
+
+          if [ "${{ needs.sast-bandit.result }}" = "failure" ] || \
+             [ "${{ needs.sca-pip-audit.result }}" = "failure" ] || \
+             [ "${{ needs.trivy-filesystem.result }}" = "failure" ] || \
+             [ "${{ needs.trivy-config.result }}" = "failure" ] || \
+             [ "${{ needs.trivy-image.result }}" = "failure" ]; then
+            echo "One or more security gates failed."
+            exit 1
+          fi
