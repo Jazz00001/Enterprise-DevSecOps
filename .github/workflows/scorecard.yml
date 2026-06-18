@@ -1,0 +1,80 @@
+name: OpenSSF Scorecard
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  branch_protection_rule:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 6 * * 1"
+
+permissions:
+  contents: read
+  actions: read
+  checks: read
+  pull-requests: read
+  security-events: write
+  id-token: write
+
+concurrency:
+  group: openssf-scorecard-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scorecard:
+    name: OpenSSF Scorecard Supply Chain Review
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Run OpenSSF Scorecard
+        uses: ossf/scorecard-action@v2.4.3
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          results_file: scorecard-results.sarif
+          results_format: sarif
+          publish_results: true
+
+      - name: Upload Scorecard SARIF to GitHub Code Scanning
+        if: always() && hashFiles('scorecard-results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v4
+        continue-on-error: true
+        with:
+          sarif_file: scorecard-results.sarif
+          category: openssf-scorecard
+
+      - name: Save Scorecard artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: openssf-scorecard-results
+          path: scorecard-results.sarif
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Create Scorecard run summary
+        if: always()
+        run: |
+          {
+            echo "# OpenSSF Scorecard Summary"
+            echo
+            echo "Repository: ${{ github.repository }}"
+            echo "Ref: ${{ github.ref }}"
+            echo "Commit: ${{ github.sha }}"
+            echo
+            echo "The Scorecard SARIF file is uploaded as a workflow artifact."
+            echo "If GitHub Code Scanning is enabled for this repository, Scorecard findings will also appear under the Security tab."
+            echo
+            echo "Recommended follow-up controls for this Enterprise DevSecOps project:"
+            echo "- Protect the main branch with required reviews."
+            echo "- Pin third-party GitHub Actions to commit SHA for production-grade hardening."
+            echo "- Keep security-gates.yml as a required status check."
+            echo "- Keep dependency scanning and container image scanning enabled on every pull request."
+            echo "- Review token permissions and avoid write-all workflow permissions."
+          } >> "$GITHUB_STEP_SUMMARY"

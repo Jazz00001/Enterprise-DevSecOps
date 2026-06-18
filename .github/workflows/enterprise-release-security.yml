@@ -1,0 +1,59 @@
+name: Enterprise Release Security Evidence
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  packages: write
+  security-events: write
+  id-token: write
+
+jobs:
+  release-evidence:
+    name: Build SBOM and release evidence
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Build image
+        run: docker build -t enterprise-devsecops-release:${{ github.sha }} .
+
+      - name: Generate SBOM with Syft
+        uses: anchore/sbom-action@v0
+        with:
+          image: enterprise-devsecops-release:${{ github.sha }}
+          format: spdx-json
+          output-file: security/sbom/release-sbom-spdx.json
+
+      - name: Scan image with Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: enterprise-devsecops-release:${{ github.sha }}
+          format: sarif
+          output: security/reports/release-trivy-image.sarif
+          severity: CRITICAL,HIGH
+          exit-code: "0"
+
+      - name: Upload Trivy SARIF
+        if: always() && hashFiles('security/reports/release-trivy-image.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: security/reports/release-trivy-image.sarif
+          category: release-trivy-image
+
+      - name: Upload release evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-security-evidence
+          path: |
+            security/sbom/release-sbom-spdx.json
+            security/reports/release-trivy-image.sarif
+          retention-days: 90
