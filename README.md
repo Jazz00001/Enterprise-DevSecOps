@@ -1038,27 +1038,6 @@ It includes:
 | Reporting             | Professional PDFs and evidence index          |
 | GitHub Security       | SECURITY.md, exception template, Scorecard    |
 
----
-
-## Interview Talking Points
-
-Use these points in interviews:
-
-```text
-I built a complete private Enterprise DevSecOps lab that starts with a vulnerable Flask application and secures it through SAST, SCA, Docker hardening, Kubernetes security, GitOps, supply chain security, runtime detection, monitoring, and compliance mapping.
-```
-
-```text
-I did not only run scanners. I created findings, mapped them to frameworks, documented remediation, performed retesting, created evidence screenshots, and built professional reports similar to what security teams use in real organizations.
-```
-
-```text
-The Kubernetes phase includes RBAC least privilege, Pod Security restricted enforcement, NetworkPolicy validation, OPA Gatekeeper admission control, Falco runtime detection, Prometheus metrics, and Grafana dashboards.
-```
-
-```text
-The supply chain phase includes Cosign image signing, Syft SBOM generation in SPDX and CycloneDX formats, SLSA-style provenance, image digest tracking, vulnerability exceptions, and accepted-risk documentation.
-```
 
 ---
 
