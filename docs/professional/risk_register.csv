@@ -1,0 +1,9 @@
+Risk ID,Category,Risk,Likelihood,Impact,Rating,Treatment,Owner,Status
+RISK-001,Credibility,PDF reports contain wrong author name,High,High,Critical,Regenerate or remove public PDFs; run name audit,Owner,Open
+RISK-002,Quality,Security header tests fail,Medium,High,High,Add after_request hook; rerun pytest,Owner,Mitigated in upgrade
+RISK-003,AppSec,Intentionally vulnerable routes misunderstood as production code,Medium,High,High,Document vulnerable vs hardened modes,Owner,Mitigated
+RISK-004,SCA,Outdated dependencies in lab requirements,High,Medium,High,Add requirements-secure and exception documentation,Owner,Open
+RISK-005,Supply Chain,GitHub Actions not pinned to immutable SHAs,Medium,Medium,Medium,Pin actions before final public release,Owner,Open
+RISK-006,GitOps,Argo CD default project too broad,Medium,Medium,Medium,Add restricted AppProject,Owner,Open
+RISK-007,Evidence,Screenshots lack integrity metadata,Medium,Medium,Medium,Generate SHA256 evidence manifest,Owner,Mitigated in upgrade
+RISK-008,Secrets,Potential private key upload risk,Low,Critical,High,Keep cosign.key in .gitignore; scan with Gitleaks/Trivy,Owner,Monitoring

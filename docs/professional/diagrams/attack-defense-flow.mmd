@@ -1,0 +1,12 @@
+flowchart TD
+    A[Insecure Code or Dependency] --> B[CI/CD Security Gate]
+    B -->|Fail| C[Developer Remediation]
+    B -->|Pass| D[Container Build]
+    D --> E[Image Scan + SBOM]
+    E --> F[Image Signing]
+    F --> G[GitOps Deployment]
+    G --> H[Admission Policy]
+    H -->|Blocked| I[Policy Violation Evidence]
+    H -->|Allowed| J[Hardened Kubernetes Workload]
+    J --> K[Runtime Detection]
+    K --> L[Retest + Report]

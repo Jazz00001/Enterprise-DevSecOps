@@ -1,0 +1,201 @@
+Old author/name references found (showing up to 200):
+docs/Enterprise_DevSecOps_AppSec_Test_Cases.pdf:4: Author: Jagriti Banerjee
+docs/Enterprise_DevSecOps_AppSec_Test_Cases.pdf:37: Jagriti Banerjee
+docs/Enterprise_DevSecOps_AppSec_Test_Cases.pdf:57: Jagriti Banerjee
+docs/Enterprise_DevSecOps_AppSec_Test_Cases.pdf:87: Jagriti Banerjee
+docs/Enterprise_DevSecOps_AppSec_Test_Cases.pdf:205: Jagriti Banerjee
+docs/Enterprise_DevSecOps_AppSec_Test_Cases.pdf:276: curl "http://localhost:5000/hello?name=Jagriti"
+docs/Enterprise_DevSecOps_AppSec_Test_Cases.pdf:283: Jagriti Banerjee
+docs/Enterprise_DevSecOps_AppSec_Test_Cases.pdf:489: ame=Jagriti"
+docs/Enterprise_DevSecOps_AppSec_Test_Cases.pdf:608: Jagriti Banerjee
+docs/Enterprise_DevSecOps_AppSec_Test_Cases.pdf:791: Jagriti Banerjee
+docs/Enterprise_DevSecOps_AppSec_Test_Cases.pdf:832: Jagriti Banerjee
+docs/Enterprise_DevSecOps_AppSec_Test_Cases.pdf:872: Jagriti Banerjee
+docs/Enterprise_DevSecOps_AppSec_Test_Cases.pdf:913: Jagriti Banerjee
+docs/Enterprise_DevSecOps_AppSec_Test_Cases.pdf:964: Jagriti Banerjee
+docs/Enterprise_DevSecOps_AppSec_Test_Cases.pdf:1011: Jagriti Banerjee
+docs/Enterprise_DevSecOps_AppSec_Test_Cases.pdf:1062: Jagriti Banerjee
+docs/Enterprise_DevSecOps_AppSec_Test_Cases.pdf:1153: Jagriti Banerjee
+docs/Enterprise_DevSecOps_AppSec_Test_Cases.pdf:1213: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Audit_Summary.pdf:5: Author: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Audit_Summary.pdf:14: Enterprise DevSecOps Security Lab - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Audit_Summary.pdf:94: Enterprise DevSecOps Security Lab - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Audit_Summary.pdf:273: Enterprise DevSecOps Security Lab - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Audit_Summary.pdf:284: Enterprise DevSecOps Security Lab - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Audit_Summary.pdf:347: Enterprise DevSecOps Security Lab - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Bandit_Summary.pdf:6: Author: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Bandit_Summary.pdf:154: Jagriti Banerjee | Private Lab Evidence | Static Application Security Testing
+docs/Enterprise_DevSecOps_Bandit_Summary.pdf:274: Jagriti Banerjee | Private Lab Evidence | Static Application Security Testing
+docs/Enterprise_DevSecOps_Bandit_Summary.pdf:349: Jagriti Banerjee | Private Lab Evidence | Static Application Security Testing
+docs/Enterprise_DevSecOps_Bandit_Summary.pdf:433: Jagriti Banerjee | Private Lab Evidence | Static Application Security Testing
+docs/Enterprise_DevSecOps_Bandit_Summary.pdf:523: Jagriti Banerjee | Private Lab Evidence | Static Application Security Testing
+docs/Enterprise_DevSecOps_Bandit_Summary.pdf:579: Jagriti Banerjee | Private Lab Evidence | Static Application Security Testing
+docs/Enterprise_DevSecOps_Bandit_Summary.pdf:695: Jagriti Banerjee | Private Lab Evidence | Static Application Security Testing
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:8: Jagriti Banerjee
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:36: Prepared by Jagriti Banerjee | Private lab documentation
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:86: Prepared by Jagriti Banerjee | Private lab documentation
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:186: Prepared by Jagriti Banerjee | Private lab documentation
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:252: Prepared by Jagriti Banerjee | Private lab documentation
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:360: Prepared by Jagriti Banerjee | Private lab documentation
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:444: Prepared by Jagriti Banerjee | Private lab documentation
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:511: Prepared by Jagriti Banerjee | Private lab documentation
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:674: Prepared by Jagriti Banerjee | Private lab documentation
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:784: Prepared by Jagriti Banerjee | Private lab documentation
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:860: Prepared by Jagriti Banerjee | Private lab documentation
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:925: Prepared by Jagriti Banerjee | Private lab documentation
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:978: Prepared by Jagriti Banerjee | Private lab documentation
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:1030: Prepared by Jagriti Banerjee | Private lab documentation
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:1100: Prepared by Jagriti Banerjee | Private lab documentation
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:1183: Prepared by Jagriti Banerjee | Private lab documentation
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:1259: Prepared by Jagriti Banerjee | Private lab documentation
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:1313: Prepared by Jagriti Banerjee | Private lab documentation
+docs/Enterprise_DevSecOps_CI_CD_Threat_Model.pdf:1360: Prepared by Jagriti Banerjee | Private lab documentation
+docs/Enterprise_DevSecOps_Compliance_Mapping.pdf:5: Author: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Compliance_Mapping.pdf:13: Enterprise DevSecOps Security Lab - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Compliance_Mapping.pdf:125: Enterprise DevSecOps Security Lab - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Compliance_Mapping.pdf:220: Enterprise DevSecOps Security Lab - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Compliance_Mapping.pdf:529: Enterprise DevSecOps Security Lab - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Compliance_Mapping.pdf:744: Enterprise DevSecOps Security Lab - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Compliance_Mapping.pdf:765: Enterprise DevSecOps Security Lab - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Compliance_Mapping.pdf:828: Enterprise DevSecOps Security Lab - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Cosign_Syft_SBOM_Enterprise_Evidence.pdf:12: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Critical_Security_Gates_and_Scorecard.pdf:7: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Critical_Security_Gates_and_Scorecard.pdf:33: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Critical_Security_Gates_and_Scorecard.pdf:150: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Critical_Security_Gates_and_Scorecard.pdf:248: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Critical_Security_Gates_and_Scorecard.pdf:321: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Critical_Security_Gates_and_Scorecard.pdf:419: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Critical_Security_Gates_and_Scorecard.pdf:536: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Critical_Security_Gates_and_Scorecard.pdf:639: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Critical_Security_Gates_and_Scorecard.pdf:783: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Critical_Security_Gates_and_Scorecard.pdf:932: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Detection_Engineering_Report.pdf:5: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Detection_Report.pdf:3: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Detection_Report.pdf:10: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Detection_Report.pdf:44: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Detection_Report.pdf:145: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Detection_Report.pdf:237: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Detection_Report.pdf:308: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Detection_Report.pdf:379: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Detection_Report.pdf:450: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Detection_Report.pdf:523: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Detection_Report.pdf:594: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Detection_Report.pdf:666: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Detection_Report.pdf:738: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Detection_Report.pdf:754: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Detection_Report.pdf:789: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Detection_Report.pdf:945: Jagriti Banerjee
+docs/Enterprise_DevSecOps_DevSecOps_Pipeline_Deep_Dive.pdf:8: Jagriti Banerjee
+docs/Enterprise_DevSecOps_DevSecOps_Pipeline_Deep_Dive.pdf:47: Jagriti Banerjee
+docs/Enterprise_DevSecOps_DevSecOps_Pipeline_Deep_Dive.pdf:134: Jagriti Banerjee
+docs/Enterprise_DevSecOps_DevSecOps_Pipeline_Deep_Dive.pdf:172: Jagriti Banerjee
+docs/Enterprise_DevSecOps_DevSecOps_Pipeline_Deep_Dive.pdf:196: Jagriti Banerjee
+docs/Enterprise_DevSecOps_DevSecOps_Pipeline_Deep_Dive.pdf:261: Jagriti Banerjee
+docs/Enterprise_DevSecOps_DevSecOps_Pipeline_Deep_Dive.pdf:312: Jagriti Banerjee
+docs/Enterprise_DevSecOps_DevSecOps_Pipeline_Deep_Dive.pdf:362: Jagriti Banerjee
+docs/Enterprise_DevSecOps_DevSecOps_Pipeline_Deep_Dive.pdf:420: Jagriti Banerjee
+docs/Enterprise_DevSecOps_DevSecOps_Pipeline_Deep_Dive.pdf:479: Jagriti Banerjee
+docs/Enterprise_DevSecOps_DevSecOps_Pipeline_Deep_Dive.pdf:534: Jagriti Banerjee
+docs/Enterprise_DevSecOps_DevSecOps_Pipeline_Deep_Dive.pdf:588: Jagriti Banerjee
+docs/Enterprise_DevSecOps_DevSecOps_Pipeline_Deep_Dive.pdf:648: Jagriti Banerjee
+docs/Enterprise_DevSecOps_DevSecOps_Pipeline_Deep_Dive.pdf:717: Jagriti Banerjee
+docs/Enterprise_DevSecOps_DevSecOps_Pipeline_Deep_Dive.pdf:768: Jagriti Banerjee
+docs/Enterprise_DevSecOps_DevSecOps_Pipeline_Deep_Dive.pdf:915: Jagriti Banerjee
+docs/Enterprise_DevSecOps_DevSecOps_Pipeline_Deep_Dive.pdf:998: Jagriti Banerjee
+docs/Enterprise_DevSecOps_DevSecOps_Pipeline_Deep_Dive.pdf:1064: Document prepared by Jagriti Banerjee for the Enterprise DevSecOps project.
+docs/Enterprise_DevSecOps_Evidence_Index.pdf:14: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Evidence_Index.pdf:31: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Evidence_Index.pdf:82: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Evidence_Index.pdf:411: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Evidence_Index.pdf:627: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Evidence_Index.pdf:760: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Evidence_Index.pdf:864: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Falco_Rule_Analysis.pdf:5: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Falco_Security_Dashboard_JSON.pdf:5: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Falco_Security_Prometheus_Rules_YAML.pdf:5: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:3: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:8: Author: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:70: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:174: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:331: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:452: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:563: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:642: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:746: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:825: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:939: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:1013: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:1088: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:1158: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:1233: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:1246: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:1407: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:1413: The project was completed in a private lab environment by Jagriti Banerjee and is suitable as a portfolio artifact for DevSecOps,
+docs/Enterprise_DevSecOps_Findings_and_Remediation.pdf:1423: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Incident_Response_Runbook.pdf:5: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Kubernetes_Hardening_Checklist.pdf:16: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Kubernetes_Security_Assessment.pdf:16: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Methodology.pdf:6: Author: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Methodology.pdf:83: Enterprise DevSecOps Methodology - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Methodology.pdf:140: Enterprise DevSecOps Methodology - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Methodology.pdf:308: Enterprise DevSecOps Methodology - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Methodology.pdf:428: Enterprise DevSecOps Methodology - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Methodology.pdf:599: Enterprise DevSecOps Methodology - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Methodology.pdf:692: Enterprise DevSecOps Methodology - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Methodology.pdf:787: Enterprise DevSecOps Methodology - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Methodology.pdf:915: Enterprise DevSecOps Methodology - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Methodology.pdf:1020: Enterprise DevSecOps Methodology - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Methodology.pdf:1100: Enterprise DevSecOps Methodology - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Methodology.pdf:1140: Enterprise DevSecOps Methodology - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Network_Policy_Validation.pdf:16: Jagriti Banerjee
+docs/Enterprise_DevSecOps_OWASP_ASVS_Top10_Mapping.pdf:7: Jagriti Banerjee
+docs/Enterprise_DevSecOps_OWASP_ASVS_Top10_Mapping.pdf:485: /hello?name=Jagriti
+docs/Enterprise_DevSecOps_Pod_Security_Validation.pdf:16: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Post_Mortem.pdf:15: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Post_Mortem.pdf:32: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Post_Mortem.pdf:85: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Post_Mortem.pdf:134: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Post_Mortem.pdf:283: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Post_Mortem.pdf:421: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Post_Mortem.pdf:466: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Provenance_Summary.pdf:3: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Provenance_Summary.pdf:18: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Provenance_Summary.pdf:79: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Provenance_Summary.pdf:214: Jagriti Banerjee
+docs/Enterprise_DevSecOps_RBAC_Review.pdf:16: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Risk_Register.pdf:5: Author: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Risk_Register.pdf:13: Enterprise DevSecOps Security Lab - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Risk_Register.pdf:119: Enterprise DevSecOps Security Lab - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Risk_Register.pdf:554: Enterprise DevSecOps Security Lab - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Risk_Register.pdf:755: Enterprise DevSecOps Security Lab - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Risk_Register.pdf:818: Enterprise DevSecOps Security Lab - Jagriti Banerjee
+docs/Enterprise_DevSecOps_SBOM_Summary.pdf:3: Jagriti Banerjee
+docs/Enterprise_DevSecOps_SBOM_Summary.pdf:18: Jagriti Banerjee
+docs/Enterprise_DevSecOps_SBOM_Summary.pdf:79: Jagriti Banerjee
+docs/Enterprise_DevSecOps_SBOM_Summary.pdf:171: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:3: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:8: Author: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:47: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:68: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:173: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:384: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:499: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:592: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:687: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:785: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:891: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:984: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:1079: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:1177: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:1270: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:1363: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:1457: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:1531: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:1690: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Finding_Report.pdf:1692: This Security Findings Report is authored for the Enterprise DevSecOps Security Lab by Jagriti Banerjee and is intended for
+docs/Enterprise_DevSecOps_Security_Gates.pdf:9: Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Gates.pdf:115: Enterprise DevSecOps Security Gates - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Gates.pdf:180: Enterprise DevSecOps Security Gates - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Gates.pdf:360: Enterprise DevSecOps Security Gates - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Gates.pdf:422: Enterprise DevSecOps Security Gates - Jagriti Banerjee
+docs/Enterprise_DevSecOps_Security_Gates.pdf:511: Enterprise DevSecOps Security Gates - Jagriti Banerjee
