@@ -70,7 +70,7 @@ COSIGN_PRIVATE_KEY       ?= $(SECURITY_DIR)/cosign/cosign.key
 # ------------------------------------------------------------------------------
 
 KIND_CLUSTER             ?= devsecops-lab
-KIND_CONFIG              ?= kind/kind-calico-cluster.yaml
+KIND_CONFIG              ?= kind-cluster.yaml
 K8S_NAMESPACE            ?= devsecops
 K8S_BASE                 ?= k8s/base
 K8S_APP_LABEL            ?= app=$(APP_NAME)
