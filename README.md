@@ -1,872 +1,1077 @@
-# Enterprise-DevSecOps
-<!-- ========================================================= -->
-<!-- Enterprise DevSecOps Red Team Lab - Professional README   -->
-<!-- Author: Jazz00001 / Rimanshu Sharma                       -->
-<!-- ========================================================= -->
-
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f2027,50:203a43,100:2c5364&height=220&section=header&text=Enterprise%20DevSecOps%20Red%20Team%20Lab&fontSize=38&fontColor=ffffff&animation=fadeIn&fontAlignY=35&desc=CI%2FCD%20Security%20%7C%20Kubernetes%20%7C%20GitOps%20%7C%20Supply%20Chain%20%7C%20PTaaS%20Reporting&descAlignY=55&descSize=16" alt="Enterprise DevSecOps Red Team Lab Banner"/>
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=220&color=0:0f172a,45:1d4ed8,100:22c55e&text=Enterprise%20DevSecOps%20Security%20Lab&fontColor=ffffff&fontSize=34&fontAlignY=38&desc=CI/CD%20Security%20%7C%20Kubernetes%20Hardening%20%7C%20Supply%20Chain%20%7C%20Runtime%20Detection&descAlignY=58&descSize=16" alt="Enterprise DevSecOps Security Lab Banner" />
 </p>
 
 <p align="center">
-  <a href="https://github.com/Jazz00001/Enterprise-DevSecOps-Redteam-Lab">
-    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=22&duration=2500&pause=700&center=true&vCenter=true&width=1000&lines=Build+%E2%86%92+Break+%E2%86%92+Detect+%E2%86%92+Harden+%E2%86%92+Retest+%E2%86%92+Report;Enterprise+DevSecOps+Security+Assessment+Lab;API+Security+%2B+CI%2FCD+Abuse+%2B+Kubernetes+Misconfiguration;Supply+Chain+Security+%2B+SBOM+%2B+Policy-as-Code;PTaaS-Style+Finding+Cards+%2B+Compliance+Mapping" alt="Typing SVG" />
-  </a>
+  <img src="https://readme-typing-svg.demolab.com?font=Inter&weight=700&size=24&pause=900&color=22C55E&center=true&vCenter=true&width=1000&lines=Application+Security+%E2%86%92+Container+Security+%E2%86%92+Kubernetes+Security;GitHub+Actions+Security+Gates+%E2%86%92+ArgoCD+GitOps+%E2%86%92+Falco+Runtime+Detection;Cosign+Signing+%E2%86%92+Syft+SBOM+%E2%86%92+SLSA-Style+Provenance+%E2%86%92+Compliance+Mapping" alt="Animated DevSecOps Typing Banner" />
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Project-Enterprise%20DevSecOps%20Red%20Team%20Lab-0f2027?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Status-Portfolio%20Ready-brightgreen?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Focus-DevSecOps%20%7C%20VAPT%20%7C%20PTaaS-blue?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Ethics-Authorized%20Lab-red?style=for-the-badge" />
+  <a href="./SECURITY.md"><img src="https://img.shields.io/badge/Security%20Policy-Enabled-22c55e?style=for-the-badge&logo=githubsecuritylab&logoColor=white" /></a>
+  <a href="./docker-compose.yml"><img src="https://img.shields.io/badge/Docker-Compose-2563eb?style=for-the-badge&logo=docker&logoColor=white" /></a>
+  <a href="./k8s/base"><img src="https://img.shields.io/badge/Kubernetes-Hardened-326ce5?style=for-the-badge&logo=kubernetes&logoColor=white" /></a>
+  <a href="./security/sbom"><img src="https://img.shields.io/badge/SBOM-Syft-7c3aed?style=for-the-badge&logo=cyclonedx&logoColor=white" /></a>
+  <a href="./monitoring"><img src="https://img.shields.io/badge/Runtime%20Detection-Falco-f97316?style=for-the-badge&logo=falco&logoColor=white" /></a>
 </p>
 
-
 <p align="center">
-  <img src="https://skillicons.dev/icons?i=python,fastapi,docker,kubernetes,githubactions,gitlab,bash,linux,terraform,aws,git,github" />
+  <img src="https://img.shields.io/badge/SAST-Bandit-blue?style=flat-square" />
+  <img src="https://img.shields.io/badge/SCA-pip--audit-purple?style=flat-square" />
+  <img src="https://img.shields.io/badge/Image%20Scan-Trivy-red?style=flat-square" />
+  <img src="https://img.shields.io/badge/GitOps-ArgoCD-orange?style=flat-square" />
+  <img src="https://img.shields.io/badge/Policy%20as%20Code-OPA%20Gatekeeper-yellow?style=flat-square" />
+  <img src="https://img.shields.io/badge/Monitoring-Prometheus%20%2B%20Grafana-green?style=flat-square" />
+  <img src="https://img.shields.io/badge/Scorecard-OpenSSF-0f172a?style=flat-square" />
 </p>
 
 ---
 
-## 🧭 Table of Contents
+# Enterprise DevSecOps Security Lab
 
-- [Project Overview](#-project-overview)
-- [Executive Summary](#-executive-summary)
-- [Business Scenario](#-business-scenario)
-- [Assessment Scope](#-assessment-scope)
-- [Project Architecture](#-project-architecture)
-- [Attack Path](#-attack-path)
-- [DevSecOps Lifecycle](#-devsecops-lifecycle)
-- [Tools and Technologies](#-tools-and-technologies)
-- [Repository Structure](#-repository-structure)
-- [Key Security Findings](#-key-security-findings)
-- [Sub-Project Breakdown](#-sub-project-breakdown)
-- [Evidence Gallery](#-evidence-gallery)
-- [Professional Reports](#-professional-reports)
-- [Compliance Mapping](#-compliance-mapping)
-- [Before vs After Security Maturity](#-before-vs-after-security-maturity)
-- [Quick Start](#-quick-start)
-- [Interview Talking Points](#-interview-talking-points)
-- [Resume Bullet](#-resume-bullet)
-- [Ethical Disclaimer](#-ethical-disclaimer)
+## Executive Summary
+
+This project is a **private, end-to-end Enterprise DevSecOps Security Lab** designed to demonstrate how modern security engineering is applied across the full software delivery lifecycle.
+
+The lab starts with a deliberately vulnerable Flask application and progressively secures it through:
+
+* Application security testing
+* CI/CD security gates
+* Docker image hardening
+* Kubernetes security controls
+* GitOps deployment with drift correction
+* Software supply chain security
+* SBOM generation and signing evidence
+* Runtime threat detection
+* Security observability
+* Compliance-style control mapping
+* Professional reporting and retest proof
+
+The project was built to simulate how security teams, DevSecOps engineers, cloud security engineers, and application security engineers secure real workloads before they reach production.
+
+> **Important:** This repository contains intentionally vulnerable code and attack simulations for controlled private-lab learning only. It must not be exposed to the public internet or used against third-party systems.
 
 ---
 
-# 🚀 Project Overview
+## Project Story
 
-## Enterprise DevSecOps Red Team Lab  
-### CI/CD · Kubernetes · GitOps · Supply Chain Security · PTaaS Reporting
-
-This repository is a complete **enterprise-style DevSecOps Red Team and Supply Chain Security Assessment Lab**.
-
-It simulates how a modern cloud-native organization can be compromised through weaknesses in:
-
-- Source code security
-- API authorization
-- Secret management
-- CI/CD pipeline design
-- Container image hardening
-- Dependency and image scanning
-- Software Bill of Materials generation
-- Kubernetes workload configuration
-- GitOps deployment governance
-- Policy-as-Code enforcement
-- Terraform/IaC security
-- Retest and remediation workflow
-- PTaaS-style reporting
-
-The project follows a realistic security consulting lifecycle:
+This lab follows a realistic enterprise security journey:
 
 ```text
-Build → Break → Detect → Harden → Retest → Report
+Vulnerable Flask Application
+        ↓
+Application Security Testing
+        ↓
+Secure Code Remediation
+        ↓
+Docker Hardening
+        ↓
+CI/CD Security Gates
+        ↓
+Container Image Scanning
+        ↓
+Kubernetes Hardening
+        ↓
+GitOps Deployment
+        ↓
+Supply Chain Security
+        ↓
+Runtime Detection
+        ↓
+Security Observability
+        ↓
+Compliance Mapping and Audit Evidence
 ```
 
-This project is built for:
+The project does not only show tools. It shows a complete security workflow:
 
-| Target Role | Relevance |
-|---|---|
-| VAPT / Security Consultant | Finding validation, evidence, remediation, retest |
-| Application Security Analyst | API security, SAST, broken access control |
-| DevSecOps Security Engineer | CI/CD security gates, policy-as-code, automation |
-| Cloud Security Analyst | Kubernetes, IaC, container security |
-| Kubernetes Security Engineer | Pod security, resource limits, admission controls |
-| Red Team / Purple Team Intern | Attack path simulation and control validation |
-| PTaaS Security Analyst | Finding cards, retest reports, compliance mapping |
-
-> This is not a basic scanner-output project. It is structured like a professional security assessment with business impact, technical evidence, remediation, retesting, and compliance mapping.
+1. **Find** the issue.
+2. **Exploit safely** inside a private lab.
+3. **Document evidence**.
+4. **Map risk and impact**.
+5. **Remediate or accept risk**.
+6. **Retest and prove closure**.
+7. **Convert evidence into professional reports**.
 
 ---
 
-# 🧾 Executive Summary
-
-A fictional financial technology company, **AstraCloud Financial Services**, is migrating a banking API into a cloud-native DevSecOps environment.
-
-The organization uses:
-
-- GitHub / GitLab repositories
-- Automated CI/CD pipelines
-- Docker containers
-- Kubernetes deployments
-- GitOps with Argo CD
-- Terraform-based infrastructure
-- Policy-as-Code controls
-
-The security team wants to validate whether insecure code, exposed secrets, vulnerable dependencies, unsigned images, weak Kubernetes configurations, and GitOps misconfigurations can create a production-like compromise path.
-
-This lab answers that question through a full security assessment.
-
----
-
-# 🏢 Business Scenario
-
-| Field | Details |
-|---|---|
-| Company | AstraCloud Financial Services |
-| Industry | FinTech / Digital Banking |
-| Environment | Cloud-native banking API |
-| Assessment Type | DevSecOps Red Team and Supply Chain Security Assessment |
-| Application | Vulnerable banking API |
-| Deployment Model | CI/CD → Container → Kubernetes → GitOps |
-| Security Model | Shift-left + Policy-as-Code + Retest |
-| Reporting Style | PTaaS / Security Consulting |
-
-## Business Risk
-
-A single hardcoded secret, weak API authorization check, insecure Dockerfile, or privileged Kubernetes deployment can create a chain of compromise across the software delivery lifecycle.
-
-This project demonstrates how those risks are discovered, validated, hardened, and reported.
-
----
-
-# 🎯 Assessment Scope
-
-## In Scope
-
-| Area | Coverage |
-|---|---|
-| API Security | Broken access control, insecure upload, hardcoded secrets |
-| CI/CD Security | Security gates, SAST, secret scanning, pipeline abuse |
-| Container Security | Root containers, insecure Dockerfiles, Trivy scanning |
-| Supply Chain Security | SBOM, image signing concept, SLSA-style mapping |
-| Kubernetes Security | Privileged pods, resource limits, insecure manifests |
-| GitOps Security | Argo CD application and AppProject restrictions |
-| Policy-as-Code | Kyverno admission controls |
-| IaC Security | Terraform state exposure and remediation |
-| Reporting | Executive summary, finding cards, retest report, compliance map |
-
-## Out of Scope
-
-- Public internet targets
-- Third-party systems
-- Real banking data
-- Real customer information
-- Unauthorized exploitation
-- Production cloud environments
-
----
-
-# 🏗️ Project Architecture
+## Animated Architecture
 
 ```mermaid
 flowchart LR
-    A[Developer Workstation] --> B[GitHub / GitLab Repository]
-    B --> C[CI/CD Pipeline]
-    C --> D[SAST Scan]
-    C --> E[Secret Scan]
-    C --> F[Dependency Scan]
-    D --> G[Security Gate]
-    E --> G
-    F --> G
-    G --> H[Docker Build]
-    H --> I[Trivy Image Scan]
-    I --> J[SBOM Generation]
-    J --> K[Cosign Signing Concept]
-    K --> L[Container Registry Concept]
-    L --> M[GitOps Manifest Update]
-    M --> N[Argo CD]
-    N --> O[Kubernetes Cluster]
-    O --> P[Kyverno Admission Policies]
-    P --> Q[Secure Banking API Deployment]
+    A[Developer Commit] --> B[GitHub Repository]
+    B --> C[GitHub Actions CI/CD]
+
+    C --> D[Bandit SAST]
+    C --> E[pip-audit SCA]
+    C --> F[Trivy FS and Secret Scan]
+    C --> G[Docker Build]
+    G --> H[Trivy Image Scan]
+
+    H --> I[GHCR Container Image]
+    I --> J[Cosign Signature]
+    I --> K[Syft SBOM]
+    I --> L[SLSA-Style Provenance]
+
+    B --> M[ArgoCD GitOps]
+    M --> N[Kind Kubernetes Cluster]
+
+    N --> O[Hardened Flask App]
+    N --> P[RBAC]
+    N --> Q[NetworkPolicy]
+    N --> R[Pod Security]
+    N --> S[OPA Gatekeeper]
+
+    O --> T[Falco Runtime Detection]
+    T --> U[Falcosidekick]
+    U --> V[Prometheus]
+    V --> W[Grafana Security Dashboard]
+
+    W --> X[Detection Report]
+    X --> Y[Compliance Mapping]
+    Y --> Z[Audit Evidence]
 ```
 
 ---
 
-# ⚔️ Attack Path
+## High-Level Security Architecture
 
 ```mermaid
-flowchart TD
-    A[Weak Developer Workflow] --> B[Hardcoded Secret Committed]
-    B --> C[CI/CD Pipeline Executes]
-    C --> D[Security Gate Missing or Weak]
-    D --> E[Insecure Docker Image Built]
-    E --> F[Image Runs as Root]
-    F --> G[Image Published Without Signing]
-    G --> H[GitOps Manifest Updated]
-    H --> I[Argo CD Deploys Application]
-    I --> J[Privileged Kubernetes Pod Created]
-    J --> K[Runtime / Service Account Risk]
-    K --> L[Security Control Validation]
-    L --> M[Hardening Applied]
-    M --> N[Retest Confirms Risk Reduction]
+flowchart TB
+    subgraph Private_VM["Private Ubuntu VM"]
+        Docker["Docker Engine"]
+        Kind["Kind Kubernetes Cluster"]
+        Tools["Security Tooling"]
+    end
+
+    subgraph AppSec["Application Security"]
+        Flask["Vulnerable Flask App"]
+        SQLi["SQL Injection Finding"]
+        CMDi["Command Injection Finding"]
+        SSTI["Unsafe Rendering Finding"]
+        Deps["Dependency Vulnerability Finding"]
+    end
+
+    subgraph CICD["CI/CD Security"]
+        Actions["GitHub Actions"]
+        Gates["Security Gates"]
+        Scorecard["OpenSSF Scorecard"]
+    end
+
+    subgraph K8sSec["Kubernetes Security"]
+        RBAC["Least-Privilege RBAC"]
+        NetPol["NetworkPolicy"]
+        PodSec["Pod Security Restricted"]
+        Gatekeeper["OPA Gatekeeper"]
+    end
+
+    subgraph SupplyChain["Supply Chain Security"]
+        Cosign["Cosign Signing"]
+        Syft["Syft SBOM"]
+        CycloneDX["CycloneDX SBOM"]
+        SLSA["SLSA-Style Provenance"]
+    end
+
+    subgraph Detection["Runtime Detection and Observability"]
+        Falco["Falco"]
+        Sidekick["Falcosidekick"]
+        Prom["Prometheus"]
+        Grafana["Grafana"]
+    end
+
+    Docker --> Kind
+    Flask --> Docker
+    Tools --> AppSec
+    Actions --> Gates
+    Gates --> Docker
+    Kind --> K8sSec
+    Docker --> SupplyChain
+    Kind --> Detection
+    Falco --> Sidekick --> Prom --> Grafana
 ```
 
 ---
 
-# 🔄 DevSecOps Lifecycle
+## What This Project Demonstrates
 
-```mermaid
-graph LR
-    A[Plan] --> B[Code]
-    B --> C[Scan]
-    C --> D[Build]
-    D --> E[Test]
-    E --> F[Package]
-    F --> G[Sign]
-    G --> H[Deploy]
-    H --> I[Enforce Policy]
-    I --> J[Monitor]
-    J --> K[Retest]
-    K --> L[Report]
-```
-
-| Stage | Security Activity |
-|---|---|
-| Plan | Threat model and attack path design |
-| Code | SAST and secret scanning |
-| Build | Secure Dockerfile and dependency checks |
-| Test | API security and control validation |
-| Package | SBOM generation |
-| Sign | Image signing concept |
-| Deploy | Kubernetes and GitOps validation |
-| Enforce | Kyverno admission policies |
-| Retest | Verify remediation effectiveness |
-| Report | PTaaS-style deliverables |
+| Domain                | Implemented Capability                                                                                   |
+| --------------------- | -------------------------------------------------------------------------------------------------------- |
+| Application Security  | SQL injection, command injection, unsafe rendering, dependency vulnerability analysis                    |
+| Secure Code           | Remediation examples, security tests, safer coding patterns                                              |
+| CI/CD Security        | Security gates, scanner integration, workflow hardening, OpenSSF Scorecard                               |
+| Container Security    | Hardened Dockerfile, non-root user, Trivy image scanning                                                 |
+| Kubernetes Security   | RBAC, NetworkPolicy, Pod Security, secure deployment manifests                                           |
+| GitOps                | ArgoCD application sync, drift detection, self-healing                                                   |
+| Supply Chain Security | Cosign signing, Syft SBOM, CycloneDX, SPDX, provenance evidence                                          |
+| Runtime Security      | Falco detections, Falcosidekick forwarding, Prometheus alerts                                            |
+| Observability         | Grafana dashboard, Prometheus queries, alert rules                                                       |
+| Compliance            | NIST SSDF, OWASP ASVS, CIS Kubernetes Benchmark, SLSA, SOC 2 style, ISO 27001 style, PCI/HIPAA alignment |
+| Reporting             | Findings reports, retest proof, evidence index, post-mortem, risk register                               |
 
 ---
 
-# 🧰 Tools and Technologies
+## Technology Stack
 
-<p align="center">
-  <img src="https://skillicons.dev/icons?i=python,fastapi,docker,kubernetes,githubactions,gitlab,bash,linux,terraform,git,github,vscode" />
-</p>
-
-| Category | Tools / Concepts |
-|---|---|
-| API / Application | FastAPI, curl, jq, Postman-style testing |
-| CI/CD | GitHub Actions, GitLab CI template |
-| SAST | Semgrep |
-| Secret Scanning | Gitleaks |
-| Dependency / Image Scanning | Trivy |
-| Containerization | Docker |
-| SBOM | Syft |
-| Signing Concept | Cosign |
-| Kubernetes | kubectl, Kind / Minikube / K3s |
-| GitOps | Argo CD |
-| Policy-as-Code | Kyverno |
-| IaC | Terraform |
-| IaC Security | Checkov / tfsec methodology |
-| Runtime Concept | Falco-style runtime detection mapping |
-| Reporting | Markdown, CSV, Mermaid, screenshots |
-| Compliance Mapping | OWASP, CIS, NIST-style control mapping |
-
+| Layer                             | Tools                                                |
+| --------------------------------- | ---------------------------------------------------- |
+| Application                       | Python, Flask                                        |
+| Testing                           | pytest                                               |
+| SAST                              | Bandit                                               |
+| SCA                               | pip-audit                                            |
+| Filesystem / Image / IaC Scanning | Trivy                                                |
+| Containerization                  | Docker, Docker Compose                               |
+| Kubernetes                        | Kind, kubectl, Helm                                  |
+| GitOps                            | ArgoCD                                               |
+| Policy-as-Code                    | OPA Gatekeeper                                       |
+| Runtime Detection                 | Falco                                                |
+| Event Forwarding                  | Falcosidekick                                        |
+| Metrics                           | Prometheus                                           |
+| Dashboarding                      | Grafana                                              |
+| Supply Chain                      | Cosign, Syft, SPDX, CycloneDX, SLSA-style provenance |
+| Repository Security               | OpenSSF Scorecard, GitHub Actions                    |
+| Documentation                     | Markdown, PDF reports, diagrams, evidence index      |
 
 ---
 
-# 🚨 Key Security Findings
-
-| ID | Finding | Severity | Category | Status |
-|---|---|---:|---|---|
-| DEVSEC-001 | Hardcoded JWT secret in source code | High | Secret Management | Remediated / Documented |
-| DEVSEC-002 | Broken object-level authorization in profile endpoint | High | API Security | Documented |
-| DEVSEC-003 | Weak file upload validation | Medium | API Security | Documented |
-| DEVSEC-004 | Dockerfile runs container as root | High | Container Security | Fixed |
-| DEVSEC-005 | Container image lacks healthcheck and hardening | Medium | Container Security | Fixed |
-| DEVSEC-006 | Kubernetes deployment allows privileged container | High | Kubernetes Security | Blocked by Policy |
-| DEVSEC-007 | Kubernetes deployment missing CPU/memory limits | Medium | Kubernetes Security | Fixed |
-| DEVSEC-008 | Unsigned container image allowed | Critical | Supply Chain Security | Control Documented |
-| DEVSEC-009 | Broad GitOps namespace permissions | High | GitOps Security | Restricted |
-| DEVSEC-010 | Terraform state exposure risk | Critical | IaC Security | Mitigation Documented |
-
----
-
-# 🧪 Sub-Project Breakdown
-
-## 1️⃣ API Security Assessment
-
-### Objective
-
-Validate whether the banking API contains common application security weaknesses that could expose user data or allow unauthorized access.
-
-### Tested Areas
-
-- Hardcoded secrets
-- Broken object-level authorization
-- Weak file upload validation
-- Missing authorization controls
-- API endpoint abuse
-- Security remediation mapping
-
-### Evidence
-
-| Evidence | File |
-|---|---|
-| API running locally | `evidence/screenshots/05-api-running.png` |
-| API health check | `evidence/screenshots/06-api-health-check.png` |
-| BOLA / IDOR test | `evidence/screenshots/07-bola-idor-test.png` |
-| JWT secret finding | `evidence/screenshots/08-jwt-secret-finding.png` |
-| File upload validation | `evidence/screenshots/09-file-upload-validation.png` |
-
----
-
-## 2️⃣ CI/CD Pipeline Security
-
-### Objective
-
-Assess whether the CI/CD workflow can detect and block insecure code before deployment.
-
-### Tested Areas
-
-- Semgrep SAST
-- Gitleaks secret scanning
-- Trivy dependency / image scanning
-- Failing security gate
-- Retest after remediation
-- GitHub Actions evidence
-- GitLab CI hardened workflow
-
-### Evidence
-
-| Evidence | File |
-|---|---|
-| GitHub Actions workflow | `evidence/screenshots/10-github-actions-workflow.png` |
-| Failed security gate | `evidence/screenshots/11-failed-security-gate.png` |
-| Semgrep result | `evidence/screenshots/12-semgrep-result.png` |
-| Gitleaks result | `evidence/screenshots/13-gitleaks-result.png` |
-| Retest pipeline success | `evidence/screenshots/14-retest-pipeline-success.png` |
-
----
-
-## 3️⃣ Container and Supply Chain Security
-
-### Objective
-
-Demonstrate insecure vs secure container builds and supply-chain security controls.
-
-### Tested Areas
-
-- Insecure Dockerfile
-- Root container risk
-- Secure Dockerfile hardening
-- Trivy container image scan
-- SBOM generation
-- Image signing concept
-- SLSA-style supply-chain mapping
-
-### Evidence
-
-| Evidence | File |
-|---|---|
-| Insecure Docker build | `evidence/screenshots/15-insecure-docker-build.png` |
-| Secure Docker build | `evidence/screenshots/16-secure-docker-build.png` |
-| Trivy scan | `evidence/screenshots/17-trivy-scan-result.png` |
-| SBOM generation | `evidence/screenshots/18-sbom-generation.png` |
-| Before/after hardening | `evidence/screenshots/19-container-before-after.png` |
-
----
-
-## 4️⃣ Kubernetes and GitOps Security
-
-### Objective
-
-Validate Kubernetes workload security and GitOps deployment restrictions.
-
-### Tested Areas
-
-- Privileged container deployment
-- Missing CPU/memory limits
-- Insecure Kubernetes manifest
-- Secure Kubernetes manifest
-- Argo CD AppProject restriction
-- Kyverno admission control
-- Secure deployment retest
-
-### Evidence
-
-| Evidence | File |
-|---|---|
-| Cluster running | `evidence/screenshots/20-kind-cluster-running.png` |
-| Insecure K8s deployment | `evidence/screenshots/21-insecure-k8s-deployment.png` |
-| Kyverno policy block | `evidence/screenshots/22-kyverno-policy-block.png` |
-| Secure deployment accepted | `evidence/screenshots/23-secure-k8s-deployment.png` |
-| Argo CD application | `evidence/screenshots/24-argocd-application.png` |
-
----
-
-## 5️⃣ IaC, Policy-as-Code and Compliance
-
-### Objective
-
-Document infrastructure-as-code risk and map technical controls to compliance expectations.
-
-### Tested Areas
-
-- Terraform state exposure risk
-- IaC remediation
-- Policy-as-Code control matrix
-- Compliance mapping
-- Risk register
-- Retest documentation
-
-### Evidence
-
-| Evidence | File |
-|---|---|
-| Terraform review | `evidence/screenshots/25-terraform-review.png` |
-| IaC risk evidence | `evidence/screenshots/26-iac-risk-evidence.png` |
-| Compliance mapping | `evidence/screenshots/27-compliance-mapping.png` |
-| Risk register | `evidence/screenshots/28-risk-register.png` |
-| Control validation matrix | `evidence/screenshots/29-control-validation-matrix.png` |
-
----
-
-## 6️⃣ PTaaS-Style Professional Reporting
-
-### Objective
-
-Present findings like a professional penetration testing / PTaaS engagement.
-
-### Deliverables
-
-- Executive summary
-- Technical report
-- API security assessment
-- Risk register
-- Remediation roadmap
-- Retest report
-- Compliance mapping
-- PTaaS finding cards
-- Astra-style platform alignment
-- Resume bullets
-- LinkedIn post
-
-### Evidence
-
-| Evidence | File |
-|---|---|
-| Executive report | `evidence/screenshots/30-executive-report.png` |
-| Technical report | `evidence/screenshots/31-technical-report.png` |
-| Finding cards | `evidence/screenshots/32-finding-cards.png` |
-| Retest report | `evidence/screenshots/33-retest-report.png` |
-| Jira/Slack workflow concept | `evidence/screenshots/34-jira-slack-workflow.png` |
-| Screenshot index | `evidence/screenshots/35-screenshot-index.png` |
-
----
-
-# 🖼️ Evidence Gallery
-
-> Screenshots should be redacted before public upload. Do not expose JWTs, API keys, tokens, cookies, cloud IDs, internal IPs, private emails, or real credentials.
-
-## Tooling Setup
-
-| Basic Tools | Docker | kubectl | Kind |
-|---|---|---|---|
-| ![](evidence/screenshots/01-basic-tools-installed.png) | ![](evidence/screenshots/02-docker-working.png) | ![](evidence/screenshots/03-kubectl-installed.png) | ![](evidence/screenshots/04-kind-installed.png) |
-
-## API and CI/CD Evidence
-
-| API Running | Health Check | GitHub Actions | Failed Gate |
-|---|---|---|---|
-| ![](evidence/screenshots/05-api-running.png) | ![](evidence/screenshots/06-api-health-check.png) | ![](evidence/screenshots/10-github-actions-workflow.png) | ![](evidence/screenshots/11-failed-security-gate.png) |
-
-## Container and Kubernetes Evidence
-
-| Trivy Scan | SBOM | Kyverno Block | Secure Deploy |
-|---|---|---|---|
-| ![](evidence/screenshots/17-trivy-scan-result.png) | ![](evidence/screenshots/18-sbom-generation.png) | ![](evidence/screenshots/22-kyverno-policy-block.png) | ![](evidence/screenshots/23-secure-k8s-deployment.png) |
-
-## Reporting Evidence
-
-| Finding Cards | Retest Report | Compliance Mapping | Workflow Concept |
-|---|---|---|---|
-| ![](evidence/screenshots/32-finding-cards.png) | ![](evidence/screenshots/33-retest-report.png) | ![](evidence/screenshots/27-compliance-mapping.png) | ![](evidence/screenshots/34-jira-slack-workflow.png) |
-
----
-
-# 📄 Professional Reports
-
-| Report | Location | Purpose |
-|---|---|---|
-| Executive Summary | [`reports/executive-summary.md`](reports/executive-summary.md) | Business-level risk explanation |
-| Technical Report | [`reports/technical-report.md`](reports/technical-report.md) | Detailed technical findings |
-| API Security Assessment | [`reports/api-security-assessment.md`](reports/api-security-assessment.md) | API-specific security review |
-| DevSecOps Maturity Assessment | [`reports/devsecops-maturity-assessment.md`](reports/devsecops-maturity-assessment.md) | Before/after security maturity |
-| Risk Register | [`reports/risk-register.csv`](reports/risk-register.csv) | Risk tracking and severity |
-| Retest Report | [`reports/retest-report.md`](reports/retest-report.md) | Remediation validation |
-| Remediation Roadmap | [`reports/remediation-roadmap.md`](reports/remediation-roadmap.md) | Step-by-step fix plan |
-| Security Control Matrix | [`reports/security-control-validation-matrix.md`](reports/security-control-validation-matrix.md) | Control validation |
-| Compliance Mapping | [`reports/compliance-mapping.md`](reports/compliance-mapping.md) | Security-to-compliance alignment |
-| Astra PTaaS Alignment | [`reports/astra-ptaas-alignment.md`](reports/astra-ptaas-alignment.md) | PTaaS-style project positioning |
-| Resume Bullets | [`reports/resume-bullets.md`](reports/resume-bullets.md) | Resume-ready impact statements |
-| LinkedIn Post | [`reports/linkedin-post.md`](reports/linkedin-post.md) | Public project announcement |
-
----
-
-# 🧩 Finding Card Format
-
-Each finding is documented in a PTaaS-style format:
+## Repository Structure
 
 ```text
-Finding ID
-Title
-Severity
-Affected Asset
-Business Impact
-Technical Evidence
-Steps to Reproduce
-Root Cause
-Remediation
-Retest Status
-References / Control Mapping
+Enterprise-DevSecOps/
+├── .github/
+│   ├── workflows/
+│   │   ├── security-gates.yml
+│   │   └── scorecard.yml
+│   └── ISSUE_TEMPLATE/
+│       └── security_exception_request.md
+│
+├── src/
+│   └── app/
+│       ├── app.py
+│       ├── init_db.py
+│       └── requirements.txt
+│
+├── tests/
+│   ├── test_health.py
+│   ├── test_routes.py
+│   └── test_security_headers.py
+│
+├── k8s/
+│   └── base/
+│       ├── namespace.yaml
+│       ├── rbac.yaml
+│       ├── deployment.yaml
+│       ├── service.yaml
+│       ├── network-policy.yaml
+│       └── kustomization.yaml
+│
+├── monitoring/
+│   ├── dashboards/
+│   │   └── falco_security_dashboard.json
+│   ├── rules/
+│   │   └── falco_security_prometheus_rules.yaml
+│   └── values/
+│
+├── security/
+│   ├── reports/
+│   ├── sbom/
+│   ├── cosign/
+│   ├── provenance/
+│   └── policies/
+│
+├── redteam/
+│   ├── runtime/
+│   └── rbac/
+│
+├── docs/
+│   ├── architecture/
+│   ├── evidence/
+│   ├── findings/
+│   ├── templates/
+│   └── reports/
+│
+├── diagrams/
+│   └── data-flow-diagram.svg
+│
+├── evidence/
+│   └── screenshots/
+│
+├── Dockerfile
+├── docker-compose.yml
+├── kind-cluster.yaml
+├── SECURITY.md
+├── SECURITY_EXCEPTION_TEMPLATE.md
+├── SECURITY_FINDINGS_REPORT.md
+├── README.md
+└── LICENSE
 ```
 
-## Example Finding Flow
+---
+
+## Vulnerable Application Scope
+
+The project includes a deliberately vulnerable Flask application to demonstrate realistic AppSec testing.
+
+| Route          | Vulnerability Type                         | Purpose                                               |
+| -------------- | ------------------------------------------ | ----------------------------------------------------- |
+| `/health`      | Health check                               | Used for tests, Docker healthcheck, Kubernetes probes |
+| `/user?id=`    | SQL Injection                              | Demonstrates unsafe query construction                |
+| `/ping?host=`  | Command Injection                          | Demonstrates unsafe shell execution                   |
+| `/hello?name=` | Unsafe rendering / template injection risk | Demonstrates unsafe user-controlled rendering         |
+
+---
+
+## Application Security Findings
+
+| ID      | Finding                   |      Severity | CWE / OWASP Mapping      | Status              |
+| ------- | ------------------------- | ------------: | ------------------------ | ------------------- |
+| APP-001 | SQL Injection             |          High | CWE-89 / OWASP Injection | Documented          |
+| APP-002 | Command Injection         |          High | CWE-78 / OWASP Injection | Documented          |
+| APP-003 | Unsafe Template Rendering |          High | CWE-94 / CWE-1336        | Documented          |
+| APP-004 | Vulnerable Dependency     | Medium / High | CWE-937 / CWE-1104       | Documented          |
+| APP-005 | Missing Security Headers  |        Medium | OWASP Secure Headers     | Test coverage added |
+
+---
+
+## Secure Remediation Examples
+
+| Insecure Pattern                   | Secure Remediation                            |
+| ---------------------------------- | --------------------------------------------- |
+| SQL query string interpolation     | Parameterized SQL queries                     |
+| `shell=True` with user input       | Subprocess argument list with validation      |
+| User-controlled template rendering | Static templates with safe context variables  |
+| Unpinned vulnerable dependencies   | Version pinning and dependency upgrades       |
+| Missing security headers           | Flask `after_request` security headers        |
+| Root container execution           | Non-root UID/GID                              |
+| Writable root filesystem           | Read-only root filesystem and writable `/tmp` |
+| Overprivileged RBAC                | Namespace-scoped least privilege              |
+| Missing NetworkPolicy              | Default deny and explicit allow               |
+| Unsigned image                     | Cosign signature and verification             |
+
+---
+
+## CI/CD Security Gates
+
+This project includes GitHub Actions workflows for security automation.
+
+### Implemented Workflows
+
+| Workflow             | Purpose                                                           |
+| -------------------- | ----------------------------------------------------------------- |
+| `security-gates.yml` | Blocks critical security issues in CI/CD                          |
+| `scorecard.yml`      | Evaluates repository supply chain posture using OpenSSF Scorecard |
+
+### Security Gate Conditions
+
+| Gate                | Fail Condition                                                              |
+| ------------------- | --------------------------------------------------------------------------- |
+| Dependency Security | Critical dependency vulnerability = fail                                    |
+| Container Security  | Critical container vulnerability = fail                                     |
+| Secret Scanning     | Secret found = fail                                                         |
+| Dockerfile Security | Critical Dockerfile misconfiguration = fail                                 |
+| Kubernetes Security | Critical Kubernetes manifest misconfiguration = fail                        |
+| SAST                | High/Critical unsafe code pattern after remediation baseline = fail         |
+| Supply Chain        | Missing expected signature, SBOM, or provenance in protected release = fail |
+
+---
+
+## CI/CD Pipeline Flow
 
 ```mermaid
 sequenceDiagram
-    participant Tester
-    participant API
-    participant Pipeline
-    participant Kubernetes
-    participant Report
+    participant Dev as Developer
+    participant GH as GitHub Repo
+    participant CI as GitHub Actions
+    participant SAST as Bandit
+    participant SCA as pip-audit
+    participant Trivy as Trivy
+    participant Docker as Docker Build
+    participant GHCR as GHCR
+    participant Cosign as Cosign
+    participant Argo as ArgoCD
+    participant K8s as Kubernetes
 
-    Tester->>API: Validate vulnerable behavior
-    API-->>Tester: Evidence captured
-    Tester->>Pipeline: Run security scans
-    Pipeline-->>Tester: Findings generated
-    Tester->>Kubernetes: Validate deployment risk
-    Kubernetes-->>Tester: Policy result captured
-    Tester->>Report: Create finding card
-    Report-->>Tester: Retest and closure status documented
+    Dev->>GH: Push code / Pull request
+    GH->>CI: Trigger workflow
+    CI->>SAST: Run Python SAST
+    CI->>SCA: Run dependency audit
+    CI->>Trivy: Scan filesystem and IaC
+    CI->>Docker: Build image
+    Docker->>Trivy: Scan container image
+    Docker->>GHCR: Push image
+    GHCR->>Cosign: Sign and verify image
+    GH->>Argo: Desired state stored in Git
+    Argo->>K8s: Sync application
 ```
 
 ---
 
-# 🛡️ Compliance Mapping
+## Docker Security
 
-This lab maps technical findings to common security frameworks and control areas.
+The Docker implementation is designed to demonstrate production-style hardening.
 
-| Control Area | Example Mapping |
-|---|---|
-| API Security | OWASP API Security Top 10 |
-| Web/Application Security | OWASP ASVS concepts |
-| Container Security | CIS Docker / container hardening concepts |
-| Kubernetes Security | CIS Kubernetes Benchmark concepts |
-| Secret Management | Secure SDLC / credential management controls |
-| CI/CD Security | Supply-chain and pipeline integrity controls |
-| IaC Security | Secure configuration and state protection |
-| Risk Management | NIST-style identify/protect/detect/respond mapping |
-| Retest | Vulnerability management lifecycle |
+### Docker Controls
 
----
+| Control               | Implemented |
+| --------------------- | ----------- |
+| Multi-stage build     | Yes         |
+| Non-root runtime user | Yes         |
+| Fixed UID/GID         | Yes         |
+| Minimal runtime image | Yes         |
+| No pip cache          | Yes         |
+| Gunicorn runtime      | Yes         |
+| Healthcheck           | Yes         |
+| Trivy image scan      | Yes         |
+| Syft SBOM             | Yes         |
+| Cosign signing        | Yes         |
 
-# 📊 Before vs After Security Maturity
+### Docker Commands
 
-| Control Area | Before | After | Improvement |
-|---|---:|---:|---|
-| Source Code Security | 1/5 | 4/5 | ✅ SAST and secure coding controls |
-| CI/CD Security | 1/5 | 4/5 | ✅ Security gates added |
-| Secret Management | 1/5 | 4/5 | ✅ Gitleaks and remediation |
-| Container Security | 1/5 | 5/5 | ✅ Secure Dockerfile and Trivy scanning |
-| Supply Chain Integrity | 0/5 | 4/5 | ✅ SBOM and signing concept |
-| Kubernetes Security | 1/5 | 5/5 | ✅ Secure manifests and Kyverno |
-| GitOps Security | 1/5 | 4/5 | ✅ Restricted AppProject |
-| Policy-as-Code | 0/5 | 5/5 | ✅ Admission control enforcement |
-| IaC Security | 1/5 | 4/5 | ✅ Terraform risk documented |
-| Reporting and Retest | 1/5 | 5/5 | ✅ PTaaS-style reporting |
+```bash
+docker build -t devsecops-vuln-app:lab .
+
+docker run --rm -p 8080:5000 devsecops-vuln-app:lab
+
+docker run --rm --entrypoint id devsecops-vuln-app:lab
+```
 
 ---
 
-# 🧪 Risk Heatmap
+## Docker Compose Usage
+
+This project includes a professional `docker-compose.yml` to support local app execution, scanning, SBOM generation, and optional observability.
+
+```bash
+docker compose up --build demo-app
+```
+
+```bash
+docker compose --profile security run --rm bandit-sast
+docker compose --profile security run --rm pip-audit-sca
+docker compose --profile security run --rm trivy-fs-scan
+docker compose --profile security run --rm trivy-image-scan
+```
+
+```bash
+docker compose --profile sbom run --rm syft-sbom
+```
+
+```bash
+docker compose --profile monitoring up -d prometheus grafana node-exporter cadvisor falcosidekick
+```
+
+---
+
+## Kubernetes Security
+
+The Kubernetes phase demonstrates how a vulnerable application can be deployed into a hardened cluster environment.
+
+### Kubernetes Controls
+
+| Control                        | Implementation                        |
+| ------------------------------ | ------------------------------------- |
+| Dedicated namespace            | `devsecops`                           |
+| Restricted Pod Security labels | Namespace-level enforcement           |
+| Dedicated ServiceAccount       | `demo-app-sa`                         |
+| Token auto-mount disabled      | `automountServiceAccountToken: false` |
+| Non-root execution             | `runAsNonRoot: true`                  |
+| Privilege escalation blocked   | `allowPrivilegeEscalation: false`     |
+| Linux capabilities dropped     | `drop: ["ALL"]`                       |
+| Read-only root filesystem      | `readOnlyRootFilesystem: true`        |
+| Seccomp profile                | `RuntimeDefault`                      |
+| Resource requests/limits       | CPU and memory configured             |
+| Health probes                  | Liveness and readiness probes         |
+| NetworkPolicy                  | Default deny and explicit allow       |
+| RBAC                           | Least privilege                       |
+| Admission control              | OPA Gatekeeper                        |
+
+---
+
+## Kubernetes Attack and Remediation Flow
 
 ```mermaid
-quadrantChart
-    title Risk Priority Matrix
-    x-axis Low Likelihood --> High Likelihood
-    y-axis Low Impact --> High Impact
-    quadrant-1 Critical Priority
-    quadrant-2 Strategic Risk
-    quadrant-3 Low Priority
-    quadrant-4 Tactical Fix
-    Hardcoded JWT Secret: [0.78, 0.82]
-    BOLA IDOR: [0.72, 0.80]
-    Unsigned Container Image: [0.82, 0.92]
-    Privileged Kubernetes Pod: [0.75, 0.86]
-    Terraform State Exposure: [0.70, 0.94]
-    Missing Resource Limits: [0.65, 0.55]
-    Weak Upload Validation: [0.58, 0.62]
+flowchart LR
+    A[Privileged Pod Created] --> B[hostPath Mounted]
+    B --> C[Node Filesystem Visible]
+    C --> D[Falco Detects Suspicious Activity]
+    D --> E[Security Finding Created]
+    E --> F[Pod Security Restricted Enforced]
+    F --> G[Privileged Pod Blocked]
+
+    H[Overprivileged ServiceAccount] --> I[ClusterRoleBinding cluster-admin]
+    I --> J[Can Access Secrets]
+    J --> K[RBAC Finding Created]
+    K --> L[ClusterRoleBinding Removed]
+    L --> M[Namespace RoleBinding Applied]
+    M --> N[Secret Access Denied]
 ```
 
 ---
 
-# ⚙️ Quick Start
+## RBAC Review
 
-## Prerequisites
+The project demonstrates both insecure and secure RBAC patterns.
 
-Install the following:
+| Scenario                                | Result                          |
+| --------------------------------------- | ------------------------------- |
+| ServiceAccount bound to `cluster-admin` | Can access cluster-wide secrets |
+| Dangerous ClusterRoleBinding removed    | Privilege reduced               |
+| Namespace RoleBinding applied           | Limited ConfigMap read access   |
+| Secret access retested                  | Denied                          |
+| Cluster-wide access retested            | Denied                          |
 
-```bash
-docker --version
-kubectl version --client
-kind version
-python3 --version
-git --version
-```
-
-Recommended tools:
+Validation command example:
 
 ```bash
-semgrep --version
-gitleaks version
-trivy --version
-syft version
+kubectl auth can-i get secrets \
+  --as=system:serviceaccount:devsecops:demo-app-sa \
+  -n devsecops
 ```
 
----
-
-## 1. Clone the Repository
-
-```bash
-git clone https://github.com/Jazz00001/Enterprise-DevSecOps-Redteam-Lab.git
-cd Enterprise-DevSecOps-Redteam-Lab
-```
-
----
-
-## 2. Run the Banking API Locally
-
-```bash
-cd app
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 8000
-```
-
-Test the API:
-
-```bash
-curl http://localhost:8000/health
-curl http://localhost:8000/profile/1001
-```
-
----
-
-## 3. Build Insecure and Secure Containers
-
-```bash
-docker build -f docker/Dockerfile.insecure -t astracloud-api:insecure .
-docker build -f docker/Dockerfile.secure -t astracloud-api:secure .
-```
-
----
-
-## 4. Run Security Scans
-
-```bash
-bash scripts/02-security-scans.sh
-```
-
-Expected scan categories:
+Expected secure result:
 
 ```text
-Semgrep  → Static Application Security Testing
-Gitleaks → Secret Detection
-Trivy    → Dependency and Container Image Scanning
-Syft     → SBOM Generation
+no
 ```
 
 ---
 
-## 5. Create Kubernetes Cluster
+## NetworkPolicy Validation
 
-```bash
-bash scripts/03-kind-cluster.sh
+The project uses NetworkPolicy to demonstrate zero-trust network segmentation.
+
+| Policy Control       | Purpose                           |
+| -------------------- | --------------------------------- |
+| Default deny ingress | Blocks unexpected inbound traffic |
+| Default deny egress  | Restricts outbound communication  |
+| Explicit app ingress | Allows only trusted traffic       |
+| DNS egress allowed   | Supports name resolution          |
+| Validation pods      | Prove allow/deny behavior         |
+
+---
+
+## Pod Security Validation
+
+Pod Security validation demonstrates that unsafe Kubernetes workload patterns are blocked.
+
+| Risky Pattern            | Expected Secure Result                |
+| ------------------------ | ------------------------------------- |
+| `privileged: true`       | Blocked                               |
+| hostPath `/` mount       | Blocked                               |
+| privilege escalation     | Blocked                               |
+| root container           | Blocked                               |
+| missing seccomp          | Warned or blocked depending on policy |
+| writable root filesystem | Hardened in secure deployment         |
+
+---
+
+## GitOps with ArgoCD
+
+ArgoCD is used to demonstrate enterprise GitOps principles.
+
+| GitOps Capability      | Implemented |
+| ---------------------- | ----------- |
+| Git as source of truth | Yes         |
+| Automated sync         | Yes         |
+| Self-healing           | Yes         |
+| Pruning                | Yes         |
+| Drift detection        | Yes         |
+| Drift remediation      | Yes         |
+
+### GitOps Drift Demo
+
+```mermaid
+flowchart LR
+    A[Git Desired State: replicas=1] --> B[ArgoCD Sync]
+    B --> C[Kubernetes Deployment Running]
+    C --> D[Manual Drift: kubectl scale replicas=3]
+    D --> E[ArgoCD Detects OutOfSync]
+    E --> F[Self-Heal Enabled]
+    F --> G[Cluster Restored to replicas=1]
 ```
 
-Validate:
+---
 
-```bash
-kubectl get nodes
-kubectl get pods -A
+## Supply Chain Security
+
+The supply chain phase makes the project enterprise-grade by adding artifact integrity and transparency.
+
+### Implemented Supply Chain Controls
+
+| Control                  | Tool                       | Evidence                    |
+| ------------------------ | -------------------------- | --------------------------- |
+| Image signing            | Cosign                     | Signature verification      |
+| SBOM generation          | Syft                       | SPDX and CycloneDX SBOM     |
+| Package inventory        | Syft                       | SBOM package count          |
+| Vulnerability visibility | Trivy                      | Top vulnerable packages     |
+| Provenance               | SLSA-style local predicate | Build traceability          |
+| Repository posture       | OpenSSF Scorecard          | Supply chain score          |
+| Vulnerability exceptions | Exception template         | Accepted risk documentation |
+| VEX notes                | VEX-style notes            | Exploitability context      |
+
+### Enterprise Evidence Fields
+
+| Evidence Item                 | Included |
+| ----------------------------- | -------- |
+| Image digest                  | Yes      |
+| Signature verification result | Yes      |
+| SBOM package count            | Yes      |
+| Top vulnerable packages       | Yes      |
+| Why vulnerable packages exist | Yes      |
+| What was fixed                | Yes      |
+| What remains accepted risk    | Yes      |
+| SLSA relevance                | Yes      |
+| CycloneDX value               | Yes      |
+
+---
+
+## Runtime Detection Engineering
+
+The runtime detection phase uses Falco, Falcosidekick, Prometheus, and Grafana.
+
+```mermaid
+flowchart LR
+    A[Container Runtime Activity] --> B[Falco]
+    B --> C[Falco Rule Match]
+    C --> D[Falcosidekick]
+    D --> E[Prometheus Metrics]
+    E --> F[Grafana Dashboard]
+    E --> G[Prometheus Alert Rules]
+    F --> H[Security Analyst Triage]
+    G --> H
+    H --> I[Incident Response Runbook]
+```
+
+### Detection Report Fields
+
+Each detection includes:
+
+| Field                | Included |
+| -------------------- | -------- |
+| Detection name       | Yes      |
+| MITRE ATT&CK mapping | Yes      |
+| Log source           | Yes      |
+| Trigger condition    | Yes      |
+| False positives      | Yes      |
+| Severity             | Yes      |
+| Triage steps         | Yes      |
+| Response steps       | Yes      |
+| Evidence screenshot  | Yes      |
+
+---
+
+## Falco Detection Examples
+
+| Detection                             | MITRE Mapping                            |      Severity | Log Source                  |
+| ------------------------------------- | ---------------------------------------- | ------------: | --------------------------- |
+| Sensitive file access from container  | Credential Access                        |          High | Falco runtime event         |
+| Privileged pod host filesystem access | Escape to Host / Privilege Escalation    |      Critical | Falco + Kubernetes          |
+| Shell spawned in container            | Execution                                | Medium / High | Falco                       |
+| Event drops detected                  | Defense Evasion / Detection Quality Risk |          High | Falco metrics               |
+| RBAC escalation simulation            | Privilege Escalation                     |          High | Kubernetes API + validation |
+
+---
+
+## Prometheus and Grafana Security Observability
+
+The project includes dashboards and rules for security monitoring.
+
+### Dashboard Panels
+
+| Panel                            | Purpose                           |
+| -------------------------------- | --------------------------------- |
+| Falco detections last 10 minutes | Quick runtime security visibility |
+| Events by priority               | Severity distribution             |
+| Top triggered rules              | Detection hotspot analysis        |
+| Kernel event processing rate     | Falco health monitoring           |
+| Dropped events                   | Detection quality assurance       |
+
+### Prometheus Rules
+
+| Alert                   | Purpose                        |
+| ----------------------- | ------------------------------ |
+| `FalcoRuntimeDetection` | Alert when Falco rules trigger |
+| `FalcoKernelEventDrops` | Alert on kernel event drops    |
+| `FalcoOutputQueueDrops` | Alert on Falco output drops    |
+
+---
+
+## Compliance and Control Mapping
+
+This project includes compliance-style mapping for security evidence.
+
+| Framework                      | Mapping Purpose                                              |
+| ------------------------------ | ------------------------------------------------------------ |
+| NIST SSDF                      | Secure software development practices                        |
+| OWASP ASVS                     | Application security controls                                |
+| CIS Kubernetes Benchmark       | Kubernetes secure configuration guidance                     |
+| SLSA                           | Supply chain integrity and tamper resistance                 |
+| SOC 2 style controls           | Security, availability, confidentiality alignment            |
+| ISO 27001 style controls       | Security governance and risk management alignment            |
+| PCI/HIPAA style alignment only | Demonstrates conceptual control alignment, not certification |
+
+> This project does not claim formal certification. The compliance documents are alignment artifacts for portfolio and learning purposes.
+
+---
+
+## Threat Modeling
+
+The project includes STRIDE-based threat modeling.
+
+### STRIDE Categories
+
+| STRIDE Category        | Example Project Risk                                 |
+| ---------------------- | ---------------------------------------------------- |
+| Spoofing               | ServiceAccount misuse or weak identity boundaries    |
+| Tampering              | Image or manifest modification                       |
+| Repudiation            | Missing audit evidence or weak pipeline traceability |
+| Information Disclosure | Secret access, SQL injection, SBOM exposure          |
+| Denial of Service      | Resource exhaustion, missing limits                  |
+| Elevation of Privilege | Cluster-admin RBAC, privileged pods                  |
+
+### STRIDE Flow
+
+```mermaid
+flowchart TB
+    A[External User / Tester] --> B[Flask Application]
+    B --> C[Container Runtime]
+    C --> D[Kubernetes Pod]
+    D --> E[Kubernetes API]
+    E --> F[Cluster Resources]
+    B --> G[SQLite / App Data]
+    C --> H[Runtime Events]
+    H --> I[Falco]
+    I --> J[Prometheus]
+    J --> K[Grafana]
+
+    B -. Spoofing .-> C
+    C -. Tampering .-> D
+    D -. Elevation of Privilege .-> E
+    B -. Information Disclosure .-> G
+    E -. Repudiation .-> F
+    C -. Denial of Service .-> D
 ```
 
 ---
 
-## 6. Deploy Insecure Workload
+## Professional Documentation Package
 
-```bash
-bash scripts/04-deploy-insecure.sh
-```
+This project includes a complete documentation set.
 
----
-
-## 7. Install and Apply Kyverno Policies
-
-```bash
-bash scripts/05-install-kyverno.sh
-bash scripts/06-apply-policies.sh
-```
-
----
-
-## 8. Deploy Secure Workload
-
-```bash
-bash scripts/07-deploy-secure.sh
-```
-
----
-
-# 🔐 Security Control Validation
-
-| Control | Validation Method | Evidence |
-|---|---|---|
-| Secret scanning | Gitleaks scan | `security-scans/gitleaks-results.md` |
-| SAST | Semgrep rules | `security-scans/semgrep-results.md` |
-| Container image scan | Trivy scan | `security-scans/trivy-results.md` |
-| SBOM | Syft output | `security-scans/sbom-summary.md` |
-| Privileged pod prevention | Kyverno block | `policy-as-code/kyverno/` |
-| Resource limit enforcement | Kubernetes manifest + Kyverno | `kubernetes/` |
-| GitOps restriction | Argo CD AppProject | `argocd/` |
-| IaC risk documentation | Terraform state review | `terraform/` |
-| Retest validation | Before/after comparison | `reports/retest-report.md` |
+| Document                                        | Purpose                               |
+| ----------------------------------------------- | ------------------------------------- |
+| `PROJECT_SUMMARY`                               | Executive project overview            |
+| `Methodology`                                   | How the project was performed         |
+| `SECURITY_FINDINGS_REPORT`                      | Professional vulnerability report     |
+| `SQL Injection Finding`                         | Dedicated finding document            |
+| `Command Injection Finding`                     | Dedicated finding document            |
+| `Template Injection / Unsafe Rendering Finding` | Dedicated finding document            |
+| `Dependency Vulnerability Finding`              | Dedicated finding document            |
+| `Secure Code Remediation Examples`              | Secure coding fixes and patterns      |
+| `Retest Proof`                                  | Validation after remediation          |
+| `DevSecOps Pipeline Deep Dive`                  | CI/CD architecture and security gates |
+| `Security Gates`                                | Gate logic and thresholds             |
+| `CI/CD Threat Model`                            | Pipeline threat modeling              |
+| `Kubernetes Security Assessment`                | K8s hardening and risk review         |
+| `RBAC Review`                                   | Least-privilege validation            |
+| `NetworkPolicy Validation`                      | Zero-trust network validation         |
+| `Pod Security Validation`                       | Pod Security restricted enforcement   |
+| `kube-bench Results`                            | CIS-style Kubernetes assessment       |
+| `Supply Chain Security Report`                  | Cosign, Syft, SBOM, provenance        |
+| `Detection Engineering Report`                  | Falco detection engineering           |
+| `Incident Response Runbook`                     | Triage and response workflow          |
+| `Evidence Index`                                | Screenshot and report mapping         |
+| `Compliance Mapping`                            | Framework alignment                   |
+| `Post-Mortem`                                   | Lessons learned and improvements      |
 
 ---
 
-# 🧠 What I Learned
+## Evidence Index
 
-This lab demonstrates practical knowledge of:
-
-- How secrets enter the software supply chain
-- Why CI/CD security gates matter
-- How insecure Dockerfiles increase runtime risk
-- Why SBOMs matter for enterprise visibility
-- How unsigned images can weaken deployment trust
-- How Kubernetes workloads become risky through misconfiguration
-- How GitOps can deploy insecure changes if not restricted
-- How Kyverno policies enforce secure defaults
-- Why retesting is critical after remediation
-- How to write professional security reports, not just run tools
-
----
-
-
-
-## What Makes This Project Different
-
-- It is not only a tool demo.
-- It follows a full security assessment lifecycle.
-- It includes before/after hardening.
-- It connects technical risk to business impact.
-- It includes retest evidence.
-- It includes professional reporting.
-- It is aligned with real DevSecOps and PTaaS workflows.
-
----
-
-# 🧑‍💼 Resume Bullet
+Evidence is organized under:
 
 ```text
-Built an enterprise DevSecOps Red Team lab simulating CI/CD abuse, API security flaws, container image risk, Kubernetes misconfiguration, GitOps deployment weakness, Terraform/IaC exposure, and software supply-chain threats; implemented security gates using Semgrep, Gitleaks, Trivy, Syft, Docker, Kubernetes, Argo CD, and Kyverno, then produced PTaaS-style finding cards, compliance mapping, risk register, remediation roadmap, and retest report.
+evidence/screenshots/
+security/reports/
+security/sbom/
+security/provenance/
+docs/evidence/
+docs/reports/
 ```
+
+### Example Evidence Categories
+
+| Category          | Evidence                                                |
+| ----------------- | ------------------------------------------------------- |
+| AppSec            | SQLi, command injection, unsafe rendering screenshots   |
+| SAST              | Bandit report                                           |
+| SCA               | pip-audit report                                        |
+| Container         | Docker build, non-root proof, Trivy image scan          |
+| Kubernetes        | Pod Security, RBAC, NetworkPolicy, deployment proof     |
+| GitOps            | ArgoCD sync, self-healing, resource tree                |
+| Supply Chain      | Cosign verify, SBOM, provenance                         |
+| Runtime Detection | Falco alerts, Prometheus queries, Grafana dashboards    |
+| Compliance        | Control validation matrix, risk register, audit summary |
 
 ---
 
-# 🔗 Suggested LinkedIn Post
+## How to Run the Project
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/YOUR_GITHUB_USERNAME/Enterprise-DevSecOps.git
+cd Enterprise-DevSecOps
+```
+
+### 2. Create Python Environment
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r src/app/requirements.txt
+pip install pytest bandit pip-audit
+```
+
+### 3. Run Tests
+
+```bash
+python -m pytest tests/ -v
+```
+
+### 4. Run Application Locally
+
+```bash
+cd src/app
+python app.py
+```
+
+Open:
 
 ```text
-I completed an Enterprise DevSecOps Red Team Lab focused on CI/CD, Kubernetes, GitOps, API security, container security, and software supply-chain risk.
+http://localhost:5000/health
+```
 
-The project simulates a cloud-native banking API moving through a modern DevSecOps pipeline and demonstrates how risks such as hardcoded secrets, broken authorization, insecure Dockerfiles, privileged Kubernetes pods, unsigned images, broad GitOps permissions, and Terraform state exposure can impact an organization.
+### 5. Build Docker Image
 
-Tools and concepts used:
-- FastAPI
-- GitHub Actions
-- GitLab CI
-- Semgrep
-- Gitleaks
-- Trivy
-- Docker
-- Syft SBOM
-- Kubernetes
-- Argo CD
-- Kyverno
-- Terraform
-- PTaaS-style reporting
+```bash
+docker build -t devsecops-vuln-app:lab .
+```
 
-The project includes:
-- Executive report
-- Technical report
-- Finding cards
-- Risk register
-- Compliance mapping
-- Remediation roadmap
-- Retest report
-- Evidence screenshots
+### 6. Run Docker Container
 
-This helped me understand how modern application security, DevSecOps, and cloud-native security fit together in a real assessment workflow.
+```bash
+docker run --rm -p 8080:5000 devsecops-vuln-app:lab
+```
+
+### 7. Run Security Scans
+
+```bash
+bandit -r src/app -f json -o security/reports/bandit-report.json
+
+pip-audit -r src/app/requirements.txt -f json -o security/reports/pip-audit-report.json
+
+trivy fs . --scanners vuln,secret,misconfig -o security/reports/trivy-fs-report.txt
+
+trivy image devsecops-vuln-app:lab -o security/reports/trivy-image-report.txt
+
+trivy config k8s/base -o security/reports/trivy-config-report.txt
+```
+
+### 8. Create Kind Cluster
+
+```bash
+kind create cluster --name devsecops-lab --config kind-cluster.yaml
+```
+
+### 9. Load Image Into Kind
+
+```bash
+kind load docker-image devsecops-vuln-app:lab --name devsecops-lab
+```
+
+### 10. Deploy Kubernetes Manifests
+
+```bash
+kubectl apply -k k8s/base
+kubectl get pods -n devsecops
+```
+
+### 11. Port Forward App
+
+```bash
+kubectl -n devsecops port-forward svc/demo-app-svc 8080:5000
+```
+
+Open:
+
+```text
+http://localhost:8080/health
 ```
 
 ---
 
-# ✅ Final Project Checklist
+## Recommended Evidence Screenshots
 
-| Task | Status |
-|---|---:|
-| Vulnerable banking API created | ✅ |
-| API security findings documented | ✅ |
-| CI/CD security pipeline added | ✅ |
-| SAST scan documented | ✅ |
-| Secret scanning documented | ✅ |
-| Trivy image scan documented | ✅ |
-| Insecure Dockerfile created | ✅ |
-| Secure Dockerfile created | ✅ |
-| SBOM concept documented | ✅ |
-| Kubernetes manifests created | ✅ |
-| Argo CD GitOps risk documented | ✅ |
-| Kyverno policies added | ✅ |
-| Terraform/IaC risk documented | ✅ |
-| Risk register created | ✅ |
-| Compliance mapping created | ✅ |
-| Retest report created | ✅ |
-| PTaaS finding cards created | ✅ |
-| Screenshot evidence added | ⬜ Add / update |
-| LinkedIn and resume content prepared | ✅ |
+Take screenshots of:
+
+| Screenshot                          | Why It Matters                  |
+| ----------------------------------- | ------------------------------- |
+| GitHub repo structure               | Shows professional organization |
+| GitHub Actions security gates       | Shows CI/CD automation          |
+| Bandit output                       | SAST evidence                   |
+| pip-audit output                    | Dependency security evidence    |
+| Trivy image scan                    | Container security evidence     |
+| Docker non-root user                | Container hardening proof       |
+| Kubernetes pods running             | Deployment proof                |
+| RBAC `can-i` denied secrets         | Least privilege proof           |
+| NetworkPolicy blocked traffic       | Zero-trust proof                |
+| Pod Security blocked privileged pod | Admission control proof         |
+| ArgoCD synced healthy               | GitOps proof                    |
+| ArgoCD self-heal                    | Drift remediation proof         |
+| Cosign verify                       | Signature proof                 |
+| Syft SBOM output                    | SBOM proof                      |
+| Falco alert                         | Runtime detection proof         |
+| Prometheus Falco query              | Metrics proof                   |
+| Grafana dashboard                   | Observability proof             |
+| kube-bench output                   | CIS-style benchmark evidence    |
 
 ---
 
-# 🚫 Ethical Disclaimer
+## Security Policy
 
-This repository is a controlled educational cybersecurity lab.
+This repository includes a professional security policy:
 
-All testing was performed only against self-owned, local, intentionally vulnerable, or simulated lab environments.
+```text
+SECURITY.md
+```
 
-Do not use any technique, script, payload, scan, or methodology from this repository against systems you do not own or do not have explicit written authorization to test.
+It defines:
 
-This project is intended for:
+* Supported scope
+* Out-of-scope activities
+* Known intentional vulnerabilities
+* Severity classification
+* Reporting expectations
+* Secret handling
+* Container security policy
+* Kubernetes security policy
+* Supply chain policy
+* Runtime detection policy
+* Retest and evidence policy
 
-- Cybersecurity learning
-- DevSecOps practice
-- Portfolio development
-- Security assessment methodology
-- Responsible security research
+---
+
+## Security Exception Process
+
+This repository includes a professional security exception process:
+
+```text
+SECURITY_EXCEPTION_TEMPLATE.md
+.github/ISSUE_TEMPLATE/security_exception_request.md
+```
+
+Use it when:
+
+* A vulnerability is intentionally retained for lab demonstration.
+* A finding is a false positive.
+* A vulnerable dependency cannot be fixed immediately.
+* A compensating control exists.
+* Risk is accepted temporarily.
+* A retest plan and expiry date are required.
+
+---
+
+## Risk Register
+
+The risk register tracks:
+
+| Field      | Description                       |
+| ---------- | --------------------------------- |
+| Risk ID    | Unique risk reference             |
+| Finding    | Security issue or control gap     |
+| Severity   | Critical / High / Medium / Low    |
+| Likelihood | Exploit probability               |
+| Impact     | Business/security impact          |
+| Owner      | Responsible person                |
+| Status     | Open / Remediated / Accepted Risk |
+| Evidence   | Screenshot or report path         |
+| Retest     | Validation method                 |
+
+---
+
+## Why This Project Is Enterprise-Grade
+
+This project is enterprise-grade because it does not stop at “I ran a tool.”
+
+It includes:
+
+* Clear project scope
+* Threat model
+* Security policy
+* Exception handling
+* Secure code remediation
+* Security gates
+* Evidence screenshots
+* Retest proof
+* Compliance mapping
+* Audit summary
+* Runtime detection engineering
+* Incident response runbook
+* Supply chain security evidence
+* Kubernetes hardening validation
+* Professional documentation
+
+---
+
+## Skills Demonstrated
+
+| Skill Area            | Demonstrated Through                          |
+| --------------------- | --------------------------------------------- |
+| DevSecOps             | CI/CD security gates and automation           |
+| AppSec                | Vulnerability testing and remediation         |
+| Cloud-Native Security | Kubernetes hardening and validation           |
+| Container Security    | Docker hardening and Trivy scans              |
+| Supply Chain Security | Cosign, Syft, SBOM, provenance                |
+| Detection Engineering | Falco rules, MITRE mapping, Prometheus alerts |
+| Incident Response     | Runbooks and triage steps                     |
+| Compliance            | NIST, OWASP, CIS, SLSA, SOC 2, ISO mapping    |
+| Reporting             | Professional PDFs and evidence index          |
+| GitHub Security       | SECURITY.md, exception template, Scorecard    |
+
+---
+
+## Interview Talking Points
+
+Use these points in interviews:
+
+```text
+I built a complete private Enterprise DevSecOps lab that starts with a vulnerable Flask application and secures it through SAST, SCA, Docker hardening, Kubernetes security, GitOps, supply chain security, runtime detection, monitoring, and compliance mapping.
+```
+
+```text
+I did not only run scanners. I created findings, mapped them to frameworks, documented remediation, performed retesting, created evidence screenshots, and built professional reports similar to what security teams use in real organizations.
+```
+
+```text
+The Kubernetes phase includes RBAC least privilege, Pod Security restricted enforcement, NetworkPolicy validation, OPA Gatekeeper admission control, Falco runtime detection, Prometheus metrics, and Grafana dashboards.
+```
+
+```text
+The supply chain phase includes Cosign image signing, Syft SBOM generation in SPDX and CycloneDX formats, SLSA-style provenance, image digest tracking, vulnerability exceptions, and accepted-risk documentation.
+```
+
+---
+
+## Disclaimer
+
+This project is for private lab, educational, and portfolio purposes only.
+
+The vulnerable application, attack simulations, insecure manifests, and privilege escalation demonstrations were performed only inside a controlled private VM and Kind Kubernetes environment.
+
+No third-party systems, public targets, employer systems, or real production environments were tested.
 
 ---
 
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:2c5364,50:203a43,100:0f2027&height=120&section=footer" />
-</p>
-
-<p align="center">
-  <b>Build Secure. Break Safely. Harden Continuously. Report Professionally.</b>
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=0:22c55e,50:1d4ed8,100:0f172a" alt="Footer Wave" />
 </p>
