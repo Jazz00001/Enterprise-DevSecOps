@@ -1,0 +1,10 @@
+=== BEFORE FIX: overprivileged-sa permissions ===
+
+Can do everything cluster-wide?
+yes
+
+Can get secrets cluster-wide?
+yes
+
+Can create clusterrolebindings?
+yes

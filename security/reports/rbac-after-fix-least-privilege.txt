@@ -1,0 +1,13 @@
+=== AFTER FIX: least privilege permissions ===
+
+Can list configmaps in rbac-lab?
+yes
+
+Can get secrets in rbac-lab?
+no
+
+Can get secrets cluster-wide?
+no
+
+Can create clusterrolebindings?
+no

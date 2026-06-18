@@ -1,0 +1,2 @@
+
+[{"critical":{"identity":{"docker-reference":"ghcr.io/jazz00001/enterprise-devsecops@sha256:14776e0fe1b95a6aab7a76d5715613d359a0e92be22716b44c1f7514bc720764"},"image":{"docker-manifest-digest":"sha256:14776e0fe1b95a6aab7a76d5715613d359a0e92be22716b44c1f7514bc720764"},"type":"https://sigstore.dev/cosign/sign/v1"},"optional":{}}]
