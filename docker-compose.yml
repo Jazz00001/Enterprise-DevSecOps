@@ -1,0 +1,537 @@
+# -----------------------------------------------------------------------------
+# Enterprise DevSecOps Security Lab - Docker Compose
+# Author/Owner: Jagriti Banerjee
+# Purpose: Local private-lab orchestration for the vulnerable Flask application,
+#          hardened runtime validation, security scanning, SBOM generation,
+#          and optional observability tooling.
+#
+# Expected repository layout:
+#   ./Dockerfile
+#   ./src/app/app.py
+#   ./src/app/requirements.txt
+#   ./security/reports/
+#   ./security/sbom/
+#
+# Quick start:
+#   docker compose up --build demo-app
+#   curl http://localhost:5000/health
+#
+# Security scans:
+#   docker compose --profile security run --rm bandit-sast
+#   docker compose --profile security run --rm pip-audit-sca
+#   docker compose --profile security run --rm trivy-fs-scan
+#   docker compose --profile security run --rm trivy-image-scan
+#
+# SBOM generation:
+#   docker compose --profile sbom run --rm syft-sbom
+#
+# Observability stack:
+#   docker compose --profile monitoring up -d prometheus grafana node-exporter cadvisor falcosidekick
+#   Prometheus: http://localhost:9090
+#   Grafana:    http://localhost:3000  admin / change-me-in-.env
+# -----------------------------------------------------------------------------
+
+name: enterprise-devsecops-lab
+
+# Reusable logging policy so containers cannot fill the VM disk.
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+# Reusable security baseline for normal application/runtime services.
+x-hardened-runtime: &hardened-runtime
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  read_only: true
+  tmpfs:
+    - /tmp:size=64m,noexec,nosuid,nodev
+  pids_limit: 256
+  logging: *default-logging
+
+services:
+  # ---------------------------------------------------------------------------
+  # 1. Vulnerable Flask application running with hardened container controls.
+  # ---------------------------------------------------------------------------
+  demo-app:
+    <<: *hardened-runtime
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: ${APP_IMAGE:-enterprise-devsecops/demo-app:local}
+    container_name: edsl-demo-app
+    user: "10001:10001"
+    environment:
+      FLASK_DEBUG: "false"
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+      APP_ENV: ${APP_ENV:-private-lab}
+    ports:
+      # Bind only to localhost so the vulnerable lab app is not exposed publicly.
+      - "127.0.0.1:${APP_PORT:-5000}:5000"
+    networks:
+      - app_net
+      - monitoring_net
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=3)\""
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+    cpus: "0.75"
+    mem_limit: 512m
+    labels:
+      project: "enterprise-devsecops-security-lab"
+      owner: "Jagriti Banerjee"
+      security.owner: "appsec-devsecops"
+      security.sbom: "syft"
+      security.signed: "cosign"
+      security.runtime: "hardened"
+      security.warning: "intentionally-vulnerable-private-lab-only"
+
+  # ---------------------------------------------------------------------------
+  # 2. Bandit SAST scan for Python application security issues.
+  #    Output is stored in ./security/reports/.
+  # ---------------------------------------------------------------------------
+  bandit-sast:
+    image: python:3.11-slim
+    container_name: edsl-bandit-sast
+    profiles: ["security"]
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace:ro
+      - ./security/reports:/reports
+    command: >
+      sh -c "
+        python -m pip install --no-cache-dir --upgrade pip bandit &&
+        bandit -r src/app -f json -o /reports/bandit-compose-report.json || true &&
+        bandit -r src/app -f txt -o /reports/bandit-compose-report.txt || true &&
+        echo 'Bandit SAST report written to security/reports/'
+      "
+    networks:
+      - scanner_net
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # 3. pip-audit SCA scan for vulnerable Python dependencies.
+  #    This should fail in a strict CI gate if critical dependency vulnerabilities
+  #    are present.
+  # ---------------------------------------------------------------------------
+  pip-audit-sca:
+    image: python:3.11-slim
+    container_name: edsl-pip-audit-sca
+    profiles: ["security"]
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace:ro
+      - ./security/reports:/reports
+    command: >
+      sh -c "
+        python -m pip install --no-cache-dir --upgrade pip pip-audit &&
+        pip-audit -r src/app/requirements.txt -f json -o /reports/pip-audit-compose-report.json || true &&
+        pip-audit -r src/app/requirements.txt > /reports/pip-audit-compose-report.txt || true &&
+        echo 'pip-audit SCA report written to security/reports/'
+      "
+    networks:
+      - scanner_net
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # 4. Trivy filesystem scan for repository vulnerabilities, secrets, and IaC
+  #    misconfigurations. This supports the security gate policy:
+  #      - Secret found = fail
+  #      - Critical config misconfiguration = fail
+  # ---------------------------------------------------------------------------
+  trivy-fs-scan:
+    image: aquasec/trivy:latest
+    container_name: edsl-trivy-fs-scan
+    profiles: ["security"]
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace:ro
+      - ./security/reports:/reports
+      - trivy-cache:/root/.cache/trivy
+    command:
+      - fs
+      - --scanners
+      - vuln,secret,misconfig
+      - --severity
+      - CRITICAL,HIGH,MEDIUM
+      - --format
+      - json
+      - --output
+      - /reports/trivy-fs-compose-report.json
+      - /workspace
+    networks:
+      - scanner_net
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # 5. Trivy container image scan for OS/library vulnerabilities.
+  #    Requires the Docker socket so Trivy can inspect the locally built image.
+  #    Gate policy:
+  #      - Critical container vulnerability = fail
+  # ---------------------------------------------------------------------------
+  trivy-image-scan:
+    image: aquasec/trivy:latest
+    container_name: edsl-trivy-image-scan
+    profiles: ["security"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./security/reports:/reports
+      - trivy-cache:/root/.cache/trivy
+    command:
+      - image
+      - --severity
+      - CRITICAL,HIGH,MEDIUM
+      - --ignore-unfixed
+      - --format
+      - json
+      - --output
+      - /reports/trivy-image-compose-report.json
+      - ${APP_IMAGE:-enterprise-devsecops/demo-app:local}
+    networks:
+      - scanner_net
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # 6. Syft SBOM generation. Produces SPDX and CycloneDX SBOMs for software
+  #    supply-chain transparency and audit evidence.
+  # ---------------------------------------------------------------------------
+  syft-sbom:
+    image: anchore/syft:latest
+    container_name: edsl-syft-sbom
+    profiles: ["sbom"]
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace:ro
+      - ./security/sbom:/out
+    command:
+      - /workspace
+      - -o
+      - spdx-json=/out/sbom-compose-spdx.json
+      - -o
+      - cyclonedx-json=/out/sbom-compose-cyclonedx.json
+    networks:
+      - scanner_net
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # 7. Prometheus config generator.
+  #    This keeps the Compose file self-contained and avoids requiring a separate
+  #    prometheus.yml file for local lab use.
+  # ---------------------------------------------------------------------------
+  prometheus-config:
+    image: alpine:3.20
+    container_name: edsl-prometheus-config
+    profiles: ["monitoring"]
+    volumes:
+      - prometheus-config:/etc/prometheus
+    command: |
+      sh -c 'cat > /etc/prometheus/prometheus.yml <<"PROMEOF"
+      global:
+        scrape_interval: 15s
+        evaluation_interval: 15s
+
+      scrape_configs:
+        - job_name: "prometheus"
+          static_configs:
+            - targets: ["prometheus:9090"]
+
+        - job_name: "demo-app"
+          metrics_path: "/health"
+          static_configs:
+            - targets: ["demo-app:5000"]
+              labels:
+                service: "vulnerable-flask-app"
+                environment: "private-lab"
+
+        - job_name: "node-exporter"
+          static_configs:
+            - targets: ["node-exporter:9100"]
+
+        - job_name: "cadvisor"
+          static_configs:
+            - targets: ["cadvisor:8080"]
+
+        - job_name: "falcosidekick"
+          metrics_path: "/metrics"
+          static_configs:
+            - targets: ["falcosidekick:2801"]
+      PROMEOF
+      echo "Prometheus configuration generated."'
+    networks:
+      - monitoring_net
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # 8. Prometheus metrics collection.
+  # ---------------------------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: edsl-prometheus
+    profiles: ["monitoring"]
+    depends_on:
+      prometheus-config:
+        condition: service_completed_successfully
+    user: "65534:65534"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,noexec,nosuid,nodev
+    volumes:
+      - prometheus-config:/etc/prometheus:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=2d
+      - --web.enable-lifecycle
+    networks:
+      - monitoring_net
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:9090/-/healthy"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    cpus: "0.75"
+    mem_limit: 1024m
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # 9. Grafana provisioning generator.
+  #    Creates Prometheus datasource provisioning without requiring separate
+  #    files. Dashboard JSON can be added later under monitoring/dashboards.
+  # ---------------------------------------------------------------------------
+  grafana-provisioning:
+    image: alpine:3.20
+    container_name: edsl-grafana-provisioning
+    profiles: ["monitoring"]
+    volumes:
+      - grafana-provisioning:/etc/grafana/provisioning
+    command: |
+      sh -c '
+      mkdir -p /etc/grafana/provisioning/datasources /etc/grafana/provisioning/dashboards
+      cat > /etc/grafana/provisioning/datasources/prometheus.yml <<"DATASOURCEEOF"
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          access: proxy
+          url: http://prometheus:9090
+          isDefault: true
+          editable: true
+      DATASOURCEEOF
+      cat > /etc/grafana/provisioning/dashboards/provider.yml <<"DASHBOARDEOF"
+      apiVersion: 1
+      providers:
+        - name: Enterprise DevSecOps Dashboards
+          orgId: 1
+          folder: Enterprise DevSecOps
+          type: file
+          disableDeletion: false
+          updateIntervalSeconds: 30
+          allowUiUpdates: true
+          options:
+            path: /var/lib/grafana/dashboards
+      DASHBOARDEOF
+      echo "Grafana provisioning generated."
+      '
+    networks:
+      - monitoring_net
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # 10. Grafana dashboards.
+  # ---------------------------------------------------------------------------
+  grafana:
+    image: grafana/grafana-oss:11.3.0
+    container_name: edsl-grafana
+    profiles: ["monitoring"]
+    depends_on:
+      prometheus:
+        condition: service_healthy
+      grafana-provisioning:
+        condition: service_completed_successfully
+    user: "472:472"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-change-me-in-.env}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_SERVER_ROOT_URL: http://localhost:${GRAFANA_PORT:-3000}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - grafana-provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "127.0.0.1:${GRAFANA_PORT:-3000}:3000"
+    networks:
+      - monitoring_net
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
+    restart: unless-stopped
+    cpus: "0.75"
+    mem_limit: 768m
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # 11. Node Exporter for host-level metrics inside the private VM.
+  # ---------------------------------------------------------------------------
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: edsl-node-exporter
+    profiles: ["monitoring"]
+    pid: host
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    command:
+      - --path.rootfs=/host
+    volumes:
+      - /:/host:ro,rslave
+    networks:
+      - monitoring_net
+    restart: unless-stopped
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # 12. cAdvisor for container resource metrics.
+  # ---------------------------------------------------------------------------
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: edsl-cadvisor
+    profiles: ["monitoring"]
+    privileged: true
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
+    networks:
+      - monitoring_net
+    restart: unless-stopped
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # 13. Falcosidekick receives Falco events and exposes Prometheus metrics.
+  #     In the Kubernetes lab this was deployed with Falco via Helm. In Compose,
+  #     this service is included for local dashboard/metrics validation.
+  # ---------------------------------------------------------------------------
+  falcosidekick:
+    image: falcosecurity/falcosidekick:latest
+    container_name: edsl-falcosidekick
+    profiles: ["monitoring", "runtime-security"]
+    environment:
+      FALCOSIDEKICK_DEBUG: "false"
+      FALCOSIDEKICK_PROMETHEUS_ENABLED: "true"
+      FALCOSIDEKICK_WEBUI_ENABLED: "false"
+    ports:
+      - "127.0.0.1:${FALCOSIDEKICK_PORT:-2801}:2801"
+    networks:
+      - monitoring_net
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:2801/healthz || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+    logging: *default-logging
+
+  # ---------------------------------------------------------------------------
+  # 14. Optional Falco runtime detector for Docker host testing.
+  #     WARNING: This service requires privileged access and host mounts because
+  #     Falco must inspect runtime/kernel activity. Use only inside a private VM.
+  # ---------------------------------------------------------------------------
+  falco:
+    image: falcosecurity/falco:latest
+    container_name: edsl-falco
+    profiles: ["runtime-security"]
+    depends_on:
+      falcosidekick:
+        condition: service_started
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/host/var/run/docker.sock:ro
+      - /dev:/host/dev:ro
+      - /proc:/host/proc:ro
+      - /boot:/host/boot:ro
+      - /lib/modules:/host/lib/modules:ro
+      - /usr:/host/usr:ro
+      - /etc:/host/etc:ro
+    command: >
+      falco
+      -o json_output=true
+      -o http_output.enabled=true
+      -o http_output.url=http://falcosidekick:2801/
+    networks:
+      - monitoring_net
+    restart: unless-stopped
+    logging: *default-logging
+
+networks:
+  # App network: private bridge for the application.
+  app_net:
+    driver: bridge
+    labels:
+      purpose: "application-runtime"
+
+  # Monitoring network: separates observability traffic from app/runtime traffic.
+  monitoring_net:
+    driver: bridge
+    labels:
+      purpose: "security-observability"
+
+  # Scanner network: used by one-shot scanner containers.
+  scanner_net:
+    driver: bridge
+    labels:
+      purpose: "security-scanning"
+
+volumes:
+  prometheus-config:
+    labels:
+      purpose: "generated-prometheus-config"
+  prometheus-data:
+    labels:
+      purpose: "prometheus-timeseries-data"
+  grafana-provisioning:
+    labels:
+      purpose: "generated-grafana-provisioning"
+  grafana-data:
+    labels:
+      purpose: "grafana-dashboard-data"
+  trivy-cache:
+    labels:
+      purpose: "trivy-vulnerability-database-cache"
