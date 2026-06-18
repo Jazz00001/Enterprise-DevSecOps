@@ -42,7 +42,7 @@ def home():
     <ul>
       <li>/user?id=1</li>
       <li>/ping?host=127.0.0.1</li>
-      <li>/hello?name=Rakshit</li>
+      <li>/hello?name=Jagriti</li>
     </ul>
     """
 
