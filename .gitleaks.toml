@@ -1,0 +1,8 @@
+title = "Enterprise DevSecOps Gitleaks Configuration"
+
+[allowlist]
+description = "Allow private-lab documentation terms but not real secrets."
+paths = [
+  "security/reports/.*",
+  "docs/professional/.*"
+]
