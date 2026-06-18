@@ -1,7 +1,7 @@
 # MNC-Ready Project Audit and Action Plan
 
 **Project:** Enterprise DevSecOps Red Team Lab  
-**Owner:** Rimanshu Sharma  
+**Owner:** Jagriti Banerjee  
 **Audit date:** 2026-06-18  
 **Assessment lens:** MNC hiring manager, DevSecOps engineer, AppSec analyst, cloud security analyst, and security consultant portfolio review.
 
