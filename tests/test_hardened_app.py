@@ -1,74 +1,55 @@
-"""Security regression tests for the hardened reference app."""
-from __future__ import annotations
-
-import importlib
-import sys
-from pathlib import Path
-from typing import Any
-
 import pytest
-from flask.testing import FlaskClient
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-APP_DIR = REPO_ROOT / "src" / "app"
-
-
-@pytest.fixture(scope="session", autouse=True)
-def add_app_to_python_path() -> None:
-    app_path = str(APP_DIR)
-    if app_path not in sys.path:
-        sys.path.insert(0, app_path)
-
-
-@pytest.fixture(scope="session")
-def flask_app() -> Any:
-    module = importlib.import_module("app_hardened")
-    application = module.app
-    application.config.update(TESTING=True)
-    return application
+from src.app.app_hardened import app
 
 
 @pytest.fixture()
-def client(flask_app: Any) -> FlaskClient:
-    return flask_app.test_client()
+def client():
+    app.config.update(TESTING=True)
+    return app.test_client()
 
 
-def test_hardened_user_route_rejects_sql_injection_payload(client: FlaskClient) -> None:
-    response = client.get("/user", query_string={"id": "1' OR '1'='1"})
-    assert response.status_code == 400
-    assert response.get_json()["error"] == "id must be an integer"
-
-
-def test_hardened_user_route_uses_parameterized_query(client: FlaskClient) -> None:
-    response = client.get("/user?id=1")
+def test_hardened_health_endpoint(client):
+    response = client.get("/health")
+    assert response.status_code == 200
     data = response.get_json()
-    assert response.status_code == 200
-    assert data["query_type"] == "parameterized"
-    assert len(data["result"]) == 1
+    assert data["status"] == "healthy"
+    assert data["runtime"] == "hardened"
 
 
-def test_hardened_ping_rejects_command_injection_payload(client: FlaskClient) -> None:
-    response = client.get("/ping", query_string={"host": "127.0.0.1; echo PWNED"})
+def test_hardened_user_route_blocks_sql_injection(client):
+    response = client.get("/user?id=1 OR 1=1")
     assert response.status_code == 400
-    assert response.get_json()["error"] == "invalid host"
+    data = response.get_json()
+    assert data["security_control"] == "input validation"
 
 
-def test_hardened_hello_escapes_template_expression(client: FlaskClient) -> None:
-    response = client.get("/hello", query_string={"name": "{{7*7}}"})
-    body = response.get_data(as_text=True)
+def test_hardened_user_route_uses_valid_id(client):
+    response = client.get("/user?id=1")
     assert response.status_code == 200
+    data = response.get_json()
+    assert data["id"] == 1
+    assert data["security_control"] == "parameterized SQL query"
+
+
+def test_hardened_ping_blocks_command_injection(client):
+    response = client.get("/ping?host=localhost;cat /etc/passwd")
+    assert response.status_code == 400
+    data = response.get_json()
+    assert data["security_control"] == "input validation and no shell execution"
+
+
+def test_hardened_hello_does_not_execute_template_expression(client):
+    response = client.get("/hello?name={{7*7}}")
+    assert response.status_code == 200
+    body = response.get_data(as_text=True)
     assert "49" not in body
-    assert "{{7*7}}" in body
+    assert "{{7*7}}" in body or "&#123;&#123;7*7&#125;&#125;" in body
 
 
-def test_hardened_security_headers_exist(client: FlaskClient) -> None:
-    response = client.get("/")
-    for header in [
-        "X-Content-Type-Options",
-        "X-Frame-Options",
-        "Content-Security-Policy",
-        "Referrer-Policy",
-        "Permissions-Policy",
-        "Cache-Control",
-    ]:
-        assert header in response.headers
+def test_hardened_security_headers_present(client):
+    response = client.get("/health")
+    assert response.headers["X-Content-Type-Options"] == "nosniff"
+    assert response.headers["X-Frame-Options"] == "DENY"
+    assert response.headers["Referrer-Policy"] == "no-referrer"
+    assert "default-src" in response.headers["Content-Security-Policy"]

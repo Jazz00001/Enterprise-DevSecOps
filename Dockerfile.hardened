@@ -1,167 +1,43 @@
-# syntax=docker/dockerfile:1.7
+# syntax=docker/dockerfile:1
 
-################################################################################
-# Dockerfile.hardened
-# Enterprise DevSecOps Security Lab
-#
-# Author: Jagriti Banerjee
-# Purpose:
-#   Production-style hardened Dockerfile for the Flask application used in the
-#   Enterprise DevSecOps project.
-#
-# Why this file exists:
-#   The GitHub Actions security workflow references Dockerfile.hardened.
-#   Therefore this file must exist in the repository root, not only as a PDF.
-#
-# Build:
-#   docker build -f Dockerfile.hardened -t devsecops-vuln-app:hardened .
-#
-# Run:
-#   docker run --rm -p 127.0.0.1:8080:5000 devsecops-vuln-app:hardened
-#
-# Validate:
-#   curl -fsS http://127.0.0.1:8080/health
-#   docker run --rm --entrypoint id devsecops-vuln-app:hardened
-#
-# Security design:
-#   - Multi-stage build
-#   - Explicit Python base version
-#   - Non-root runtime user
-#   - Fixed UID/GID for Kubernetes SecurityContext compatibility
-#   - Gunicorn instead of Flask development server
-#   - Minimal copy scope
-#   - No pip cache
-#   - No secrets copied
-#   - Healthcheck enabled
-#   - OCI metadata labels
-#   - SBOM/Cosign/Trivy/CI-CD ready
-################################################################################
-
-ARG PYTHON_VERSION=3.11.9
-
-# ==============================================================================
-# Stage 1: Dependency Builder
-# ==============================================================================
-# This stage installs Python dependencies into a virtual environment.
-# Build-time dependency installation is isolated from the final runtime image.
-# Only /opt/venv is copied into the runtime stage.
-# ==============================================================================
-
-FROM python:${PYTHON_VERSION}-slim-bookworm AS builder
-
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1 \
-    VIRTUAL_ENV=/opt/venv \
-    PATH="/opt/venv/bin:${PATH}"
-
-WORKDIR /build
-
-# Create virtual environment for dependencies.
-RUN python -m venv "${VIRTUAL_ENV}"
-
-# Copy only the dependency manifest first for better Docker layer caching.
-COPY src/app/requirements.txt ./requirements.txt
-
-# Install application dependencies.
-# Gunicorn is installed explicitly to avoid using Flask's development server.
-RUN pip install --upgrade pip setuptools wheel \
-    && pip install --no-cache-dir --requirement requirements.txt \
-    && pip install --no-cache-dir gunicorn
-
-# ==============================================================================
-# Stage 2: Hardened Runtime
-# ==============================================================================
-# The runtime image contains only:
-#   - Python slim runtime
-#   - Application source code
-#   - Prebuilt virtual environment
-#   - Dedicated non-root user
-# ==============================================================================
-
-FROM python:${PYTHON_VERSION}-slim-bookworm AS runtime
-
-# OCI labels improve traceability in registries, SBOMs, and security reviews.
-LABEL org.opencontainers.image.title="Enterprise DevSecOps Hardened Flask App" \
-      org.opencontainers.image.description="Hardened runtime container for the Enterprise DevSecOps Security Lab Flask application" \
-      org.opencontainers.image.authors="Jagriti Banerjee" \
-      org.opencontainers.image.source="https://github.com/Jazz0001/Enterprise-DevSecOps" \
-      org.opencontainers.image.documentation="docs/reports/Enterprise_DevSecOps_Dockerfile_Hardened.pdf" \
-      org.opencontainers.image.licenses="Apache-2.0" \
-      org.opencontainers.image.security.controls="multi-stage-build,non-root-user,gunicorn,healthcheck,minimal-copy,scanner-ready"
-
-# Runtime environment hardening.
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1 \
-    VIRTUAL_ENV=/opt/venv \
-    PATH="/opt/venv/bin:${PATH}" \
-    FLASK_ENV=production \
-    APP_HOME=/app \
-    APP_DATA_DIR=/tmp/app \
-    PORT=5000
-
-# Fixed UID/GID helps Kubernetes policies verify non-root execution.
-ARG APP_UID=10001
-ARG APP_GID=10001
-
-# Create a dedicated non-root user and a controlled writable temp directory.
-# /app contains code.
-# /tmp/app is available for runtime temporary files or SQLite lab data if needed.
-RUN groupadd --system --gid "${APP_GID}" appgroup \
-    && useradd --system \
-       --uid "${APP_UID}" \
-       --gid appgroup \
-       --home-dir /app \
-       --shell /usr/sbin/nologin \
-       appuser \
-    && mkdir -p /app /tmp/app \
-    && chown -R appuser:appgroup /app /tmp/app \
-    && chmod 0755 /app \
-    && chmod 1777 /tmp \
-    && chmod 1777 /tmp/app
+FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
-# Copy the prebuilt virtual environment from the builder stage.
-COPY --from=builder --chown=appuser:appgroup /opt/venv /opt/venv
+COPY src/app/requirements-secure.txt ./requirements.txt
 
-# Copy only Flask application source code.
-# Do not copy the whole repo, evidence folders, reports, Git metadata, or secrets.
-COPY --chown=appuser:appgroup src/app/ /app/
+RUN python -m pip install --upgrade pip && \
+    pip install --no-cache-dir --prefix=/install -r requirements.txt
 
-# Harden permissions:
-#   - Application files are readable.
-#   - Directories are executable/readable.
-#   - Runtime write location remains /tmp/app.
-#
-# Note:
-#   If the vulnerable lab app writes SQLite files inside /app, either:
-#     1. Update the app to use APP_DATA_DIR=/tmp/app, or
-#     2. Mount a writable volume in Kubernetes for lab state.
-RUN find /app -type f -exec chmod 0444 {} \; \
-    && find /app -type d -exec chmod 0555 {} \; \
-    && chmod 1777 /tmp/app
 
-# Drop privileges permanently for runtime.
+FROM python:3.11-slim AS runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PATH="/usr/local/bin:$PATH"
+
+WORKDIR /app
+
+RUN groupadd -g 10001 appgroup && \
+    useradd -u 10001 -g 10001 -r -s /usr/sbin/nologin appuser && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends iputils-ping && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /install /usr/local
+
+COPY src/app/app_hardened.py ./app_hardened.py
+COPY src/app/init_db.py ./init_db.py
+
+RUN python init_db.py && \
+    chown -R 10001:10001 /app && \
+    chmod -R a=rX /app
+
 USER 10001:10001
 
 EXPOSE 5000
 
-# Healthcheck uses Python standard library instead of installing curl/wget.
-# This keeps the runtime image smaller and reduces extra package surface.
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=3).read()" || exit 1
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health')" || exit 1
 
-# Gunicorn is used instead of Flask dev server.
-# Logs are sent to stdout/stderr for Docker, Kubernetes, and observability tools.
-CMD ["gunicorn", \
-     "--bind", "0.0.0.0:5000", \
-     "--workers", "2", \
-     "--threads", "2", \
-     "--timeout", "30", \
-     "--access-logfile", "-", \
-     "--error-logfile", "-", \
-     "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app_hardened:app"]
