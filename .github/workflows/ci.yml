@@ -14,6 +14,8 @@ jobs:
   build-test-report:
     name: Build, test, and generate report artifacts
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/src/app
 
     steps:
       - name: Checkout repository

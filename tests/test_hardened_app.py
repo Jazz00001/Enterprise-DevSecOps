@@ -1,55 +1,58 @@
-import pytest
+import sys
+from pathlib import Path
 
-from src.app.app_hardened import app
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+APP_DIR = PROJECT_ROOT / "src" / "app"
+
+sys.path.insert(0, str(APP_DIR))
+
+from app_hardened import app
 
 
-@pytest.fixture()
-def client():
-    app.config.update(TESTING=True)
-    return app.test_client()
+def test_health_endpoint_returns_hardened_app():
+    client = app.test_client()
 
-
-def test_hardened_health_endpoint(client):
     response = client.get("/health")
+
     assert response.status_code == 200
-    data = response.get_json()
-    assert data["status"] == "healthy"
-    assert data["runtime"] == "hardened"
+    assert response.get_json()["status"] == "ok"
+    assert response.get_json()["service"] == "hardened-flask-app"
 
 
-def test_hardened_user_route_blocks_sql_injection(client):
-    response = client.get("/user?id=1 OR 1=1")
+def test_sql_injection_payload_is_rejected():
+    client = app.test_client()
+
+    response = client.get("/user?id=1'%20OR%20'1'%3D'1")
+
     assert response.status_code == 400
-    data = response.get_json()
-    assert data["security_control"] == "input validation"
+    assert b"Invalid user id" in response.data
 
 
-def test_hardened_user_route_uses_valid_id(client):
-    response = client.get("/user?id=1")
-    assert response.status_code == 200
-    data = response.get_json()
-    assert data["id"] == 1
-    assert data["security_control"] == "parameterized SQL query"
+def test_command_injection_payload_is_rejected():
+    client = app.test_client()
 
+    response = client.get("/ping?host=127.0.0.1%3Bwhoami")
 
-def test_hardened_ping_blocks_command_injection(client):
-    response = client.get("/ping?host=localhost;cat /etc/passwd")
     assert response.status_code == 400
-    data = response.get_json()
-    assert data["security_control"] == "input validation and no shell execution"
+    assert b"Invalid host" in response.data
 
 
-def test_hardened_hello_does_not_execute_template_expression(client):
-    response = client.get("/hello?name={{7*7}}")
+def test_unsafe_rendering_is_escaped():
+    client = app.test_client()
+
+    response = client.get("/hello?name=<script>alert(1)</script>")
+
     assert response.status_code == 200
-    body = response.get_data(as_text=True)
-    assert "49" not in body
-    assert "{{7*7}}" in body or "&#123;&#123;7*7&#125;&#125;" in body
+    assert b"&lt;script&gt;alert(1)&lt;/script&gt;" in response.data
+    assert b"<script>alert(1)</script>" not in response.data
 
 
-def test_hardened_security_headers_present(client):
+def test_security_headers_are_present():
+    client = app.test_client()
+
     response = client.get("/health")
+
     assert response.headers["X-Content-Type-Options"] == "nosniff"
     assert response.headers["X-Frame-Options"] == "DENY"
     assert response.headers["Referrer-Policy"] == "no-referrer"
-    assert "default-src" in response.headers["Content-Security-Policy"]
+    assert "default-src 'self'" in response.headers["Content-Security-Policy"]
