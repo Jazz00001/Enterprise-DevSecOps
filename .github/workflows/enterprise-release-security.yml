@@ -50,7 +50,7 @@ jobs:
           category: release-trivy-image
 
       - name: Upload release evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-security-evidence
           path: |

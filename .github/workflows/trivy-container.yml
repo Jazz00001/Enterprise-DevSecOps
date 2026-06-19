@@ -33,7 +33,7 @@ jobs:
 
       - name: Upload Trivy container report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: trivy-container-gate-report
           path: security/reports/trivy-container-gate.txt
