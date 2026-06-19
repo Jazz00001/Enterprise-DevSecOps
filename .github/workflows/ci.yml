@@ -1,0 +1,56 @@
+name: CI - Build Test and Report
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-report:
+    name: Build, test, and generate report artifacts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r src/app/requirements-secure.txt
+          pip install pytest bandit pip-audit
+
+      - name: Run tests
+        run: |
+          if [ -d tests ]; then
+            pytest -q
+          else
+            echo "No tests directory found yet. CI will continue in report-only mode."
+          fi
+
+      - name: Bandit report only
+        run: |
+          mkdir -p security/reports
+          bandit -r src/app -f json -o security/reports/bandit-report-only.json || true
+
+      - name: pip-audit report only
+        run: |
+          mkdir -p security/reports
+          pip-audit -r src/app/requirements-secure.txt -f json -o security/reports/pip-audit-report-only.json || true
+
+      - name: Upload CI report artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-report-artifacts
+          path: security/reports/
+          if-no-files-found: warn
