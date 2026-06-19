@@ -1,0 +1,156 @@
+
+Report Summary
+
+┌──────────────────────────────────────────────────────────────────────────────────┬────────────┬─────────────────┬─────────┐
+│                                      Target                                      │    Type    │ Vulnerabilities │ Secrets │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ devsecops-app:hardened (debian 13.5)                                             │   debian   │       11        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/blinker-1.9.0.dist-info/METADATA          │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/click-8.4.1.dist-info/METADATA            │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/flask-3.1.3.dist-info/METADATA            │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/gunicorn-23.0.0.dist-info/METADATA        │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/itsdangerous-2.2.0.dist-info/METADATA     │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/jinja2-3.1.6.dist-info/METADATA           │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/markupsafe-3.0.3.dist-info/METADATA       │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/packaging-26.2.dist-info/METADATA         │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/pip-24.0.dist-info/METADATA               │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/setuptools-79.0.1.dist-info/METADATA      │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/setuptools/_vendor/autocommand-2.2.2.dis- │ python-pkg │        0        │    -    │
+│ t-info/METADATA                                                                  │            │                 │         │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/setuptools/_vendor/backports.tarfile-1.2- │ python-pkg │        0        │    -    │
+│ .0.dist-info/METADATA                                                            │            │                 │         │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata-8.- │ python-pkg │        0        │    -    │
+│ 0.0.dist-info/METADATA                                                           │            │                 │         │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/setuptools/_vendor/inflect-7.3.1.dist-in- │ python-pkg │        0        │    -    │
+│ fo/METADATA                                                                      │            │                 │         │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/setuptools/_vendor/jaraco.collections-5.- │ python-pkg │        0        │    -    │
+│ 1.0.dist-info/METADATA                                                           │            │                 │         │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/setuptools/_vendor/jaraco.context-5.3.0.- │ python-pkg │        1        │    -    │
+│ dist-info/METADATA                                                               │            │                 │         │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/setuptools/_vendor/jaraco.functools-4.0.- │ python-pkg │        0        │    -    │
+│ 1.dist-info/METADATA                                                             │            │                 │         │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/setuptools/_vendor/jaraco.text-3.12.1.di- │ python-pkg │        0        │    -    │
+│ st-info/METADATA                                                                 │            │                 │         │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/setuptools/_vendor/more_itertools-10.3.0- │ python-pkg │        0        │    -    │
+│ .dist-info/METADATA                                                              │            │                 │         │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/setuptools/_vendor/packaging-24.2.dist-i- │ python-pkg │        0        │    -    │
+│ nfo/METADATA                                                                     │            │                 │         │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/setuptools/_vendor/platformdirs-4.2.2.di- │ python-pkg │        0        │    -    │
+│ st-info/METADATA                                                                 │            │                 │         │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/setuptools/_vendor/tomli-2.0.1.dist-info- │ python-pkg │        0        │    -    │
+│ /METADATA                                                                        │            │                 │         │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/setuptools/_vendor/typeguard-4.3.0.dist-- │ python-pkg │        0        │    -    │
+│ info/METADATA                                                                    │            │                 │         │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/setuptools/_vendor/typing_extensions-4.1- │ python-pkg │        0        │    -    │
+│ 2.2.dist-info/METADATA                                                           │            │                 │         │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/setuptools/_vendor/wheel-0.45.1.dist-inf- │ python-pkg │        1        │    -    │
+│ o/METADATA                                                                       │            │                 │         │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/setuptools/_vendor/zipp-3.19.2.dist-info- │ python-pkg │        0        │    -    │
+│ /METADATA                                                                        │            │                 │         │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/werkzeug-3.1.8.dist-info/METADATA         │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.11/site-packages/wheel-0.45.1.dist-info/METADATA           │ python-pkg │        1        │    -    │
+└──────────────────────────────────────────────────────────────────────────────────┴────────────┴─────────────────┴─────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+devsecops-app:hardened (debian 13.5)
+====================================
+Total: 11 (HIGH: 9, CRITICAL: 2)
+
+┌──────────────┬────────────────┬──────────┬──────────────┬───────────────────┬───────────────┬──────────────────────────────────────────────────────────────┐
+│   Library    │ Vulnerability  │ Severity │    Status    │ Installed Version │ Fixed Version │                            Title                             │
+├──────────────┼────────────────┼──────────┼──────────────┼───────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ libncursesw6 │ CVE-2025-69720 │ HIGH     │ affected     │ 6.5+20250216-2    │               │ ncurses: ncurses: Buffer overflow vulnerability may lead to  │
+│              │                │          │              │                   │               │ arbitrary code execution.                                    │
+│              │                │          │              │                   │               │ https://avd.aquasec.com/nvd/cve-2025-69720                   │
+├──────────────┼────────────────┤          │              ├───────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ libsqlite3-0 │ CVE-2026-11822 │          │              │ 3.46.1-7+deb13u1  │               │ SQLite before 3.53.2 contains memory corruption              │
+│              │                │          │              │                   │               │ vulnerabilities in the ...                                   │
+│              │                │          │              │                   │               │ https://avd.aquasec.com/nvd/cve-2026-11822                   │
+│              ├────────────────┤          │              │                   ├───────────────┼──────────────────────────────────────────────────────────────┤
+│              │ CVE-2026-11824 │          │              │                   │               │ SQLite before 3.53.2 contains a heap-based buffer overflow   │
+│              │                │          │              │                   │               │ vulnerabili ...                                              │
+│              │                │          │              │                   │               │ https://avd.aquasec.com/nvd/cve-2026-11824                   │
+├──────────────┼────────────────┤          │              ├───────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ libtinfo6    │ CVE-2025-69720 │          │              │ 6.5+20250216-2    │               │ ncurses: ncurses: Buffer overflow vulnerability may lead to  │
+│              │                │          │              │                   │               │ arbitrary code execution.                                    │
+│              │                │          │              │                   │               │ https://avd.aquasec.com/nvd/cve-2025-69720                   │
+├──────────────┤                │          │              │                   ├───────────────┤                                                              │
+│ ncurses-base │                │          │              │                   │               │                                                              │
+│              │                │          │              │                   │               │                                                              │
+│              │                │          │              │                   │               │                                                              │
+├──────────────┤                │          │              │                   ├───────────────┤                                                              │
+│ ncurses-bin  │                │          │              │                   │               │                                                              │
+│              │                │          │              │                   │               │                                                              │
+│              │                │          │              │                   │               │                                                              │
+├──────────────┼────────────────┼──────────┼──────────────┼───────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ perl-base    │ CVE-2026-42496 │ CRITICAL │ fix_deferred │ 5.40.1-6          │               │ perl-archive-tar: perl-archive-tar: Path traversal via       │
+│              │                │          │              │                   │               │ crafted symlinks allows arbitrary file access                │
+│              │                │          │              │                   │               │ https://avd.aquasec.com/nvd/cve-2026-42496                   │
+│              ├────────────────┤          ├──────────────┤                   ├───────────────┼──────────────────────────────────────────────────────────────┤
+│              │ CVE-2026-8376  │          │ affected     │                   │               │ Perl versions through 5.43.10 have a heap buffer overflow    │
+│              │                │          │              │                   │               │ when compili ......                                          │
+│              │                │          │              │                   │               │ https://avd.aquasec.com/nvd/cve-2026-8376                    │
+│              ├────────────────┼──────────┼──────────────┤                   ├───────────────┼──────────────────────────────────────────────────────────────┤
+│              │ CVE-2026-42497 │ HIGH     │ fix_deferred │                   │               │ perl-Archive-Tar: perl-Archive-Tar: Arbitrary file           │
+│              │                │          │              │                   │               │ modification via crafted hardlinks during archive extraction │
+│              │                │          │              │                   │               │ https://avd.aquasec.com/nvd/cve-2026-42497                   │
+│              ├────────────────┤          ├──────────────┤                   ├───────────────┼──────────────────────────────────────────────────────────────┤
+│              │ CVE-2026-48962 │          │ affected     │                   │               │ perl-IO-Compress: perl-IO-Compress: Arbitrary code execution │
+│              │                │          │              │                   │               │ via attacker-controlled output glob                          │
+│              │                │          │              │                   │               │ https://avd.aquasec.com/nvd/cve-2026-48962                   │
+│              ├────────────────┤          ├──────────────┤                   ├───────────────┼──────────────────────────────────────────────────────────────┤
+│              │ CVE-2026-9538  │          │ fix_deferred │                   │               │ Archive::Tar versions before 3.10 for Perl allow memory      │
+│              │                │          │              │                   │               │ exhaustion via ...                                           │
+│              │                │          │              │                   │               │ https://avd.aquasec.com/nvd/cve-2026-9538                    │
+└──────────────┴────────────────┴──────────┴──────────────┴───────────────────┴───────────────┴──────────────────────────────────────────────────────────────┘
+
+Python (python-pkg)
+===================
+Total: 3 (HIGH: 3, CRITICAL: 0)
+
+┌───────────────────────────┬────────────────┬──────────┬────────┬───────────────────┬───────────────┬──────────────────────────────────────────────────────────────┐
+│          Library          │ Vulnerability  │ Severity │ Status │ Installed Version │ Fixed Version │                            Title                             │
+├───────────────────────────┼────────────────┼──────────┼────────┼───────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ jaraco.context (METADATA) │ CVE-2026-23949 │ HIGH     │ fixed  │ 5.3.0             │ 6.1.0         │ jaraco.context: jaraco.context: Path traversal via malicious │
+│                           │                │          │        │                   │               │ tar archives                                                 │
+│                           │                │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-23949                   │
+├───────────────────────────┼────────────────┤          │        ├───────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ wheel (METADATA)          │ CVE-2026-24049 │          │        │ 0.45.1            │ 0.46.2        │ wheel: wheel: Privilege Escalation or Arbitrary Code         │
+│                           │                │          │        │                   │               │ Execution via malicious wheel file...                        │
+│                           │                │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-24049                   │
+│                           │                │          │        │                   │               │                                                              │
+│                           │                │          │        │                   │               │                                                              │
+│                           │                │          │        │                   │               │                                                              │
+│                           │                │          │        │                   │               │                                                              │
+└───────────────────────────┴────────────────┴──────────┴────────┴───────────────────┴───────────────┴──────────────────────────────────────────────────────────────┘

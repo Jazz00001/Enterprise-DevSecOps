@@ -1,114 +1,118 @@
-"""Hardened reference implementation for remediation proof.
-
-This file intentionally exists beside app.py. app.py is the vulnerable lab target;
-this file demonstrates how the same ideas should be implemented safely.
-"""
-from __future__ import annotations
-
-import html
+from flask import Flask, request, jsonify, Response
+from markupsafe import escape
 import ipaddress
 import os
 import re
 import sqlite3
 import subprocess
-from pathlib import Path
-from typing import Any
-
-from flask import Flask, jsonify, request
 
 app = Flask(__name__)
-DB_PATH = Path(__file__).with_name("users.db")
-HOSTNAME_PATTERN = re.compile(r"^[A-Za-z0-9.-]{1,253}$")
+
+DB_PATH = os.path.join(os.path.dirname(__file__), "users.db")
 
 
 @app.after_request
-def set_security_headers(response: Any) -> Any:
+def add_security_headers(response):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
-    response.headers["Content-Security-Policy"] = "default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
     response.headers["Referrer-Policy"] = "no-referrer"
-    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
     response.headers["Cache-Control"] = "no-store"
+    response.headers["Content-Security-Policy"] = "default-src 'self'; frame-ancestors 'none'; base-uri 'self'"
     return response
 
 
 @app.route("/health")
-def health() -> Any:
-    return jsonify({"status": "ok", "service": "hardened-flask-app"})
+def health():
+    return jsonify({
+        "status": "ok",
+        "service": "hardened-flask-app"
+    })
 
 
 @app.route("/")
-def home() -> str:
-    return """
-    <h1>Enterprise DevSecOps Hardened Flask App</h1>
-    <p>This reference app demonstrates secure remediations for the vulnerable lab.</p>
-    <ul>
-      <li>/user?id=1</li>
-      <li>/ping?host=127.0.0.1</li>
-      <li>/hello?name=Jagriti</li>
-    </ul>
-    """
+def home():
+    return Response(
+        """
+        <h1>Enterprise DevSecOps Hardened Flask App</h1>
+        <p>This is the remediated application used by Dockerfile.hardened.</p>
+        """,
+        mimetype="text/html"
+    )
+
+
+def is_valid_user_id(value: str) -> bool:
+    return value.isdigit() and 1 <= int(value) <= 999999
 
 
 @app.route("/user")
-def get_user() -> Any:
-    user_id_raw = request.args.get("id", "1")
+def get_user():
+    user_id = request.args.get("id", "1")
+
+    if not is_valid_user_id(user_id):
+        return jsonify({
+            "error": "Invalid user id. Only numeric IDs are allowed."
+        }), 400
+
+    conn = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT id, username, role FROM users WHERE id = ?",
+        (user_id,)
+    )
+
+    result = cursor.fetchall()
+    conn.close()
+
+    return jsonify({
+        "query_type": "parameterized",
+        "result": result
+    })
+
+
+def is_valid_host(host: str) -> bool:
     try:
-        user_id = int(user_id_raw)
-    except ValueError:
-        return jsonify({"error": "id must be an integer"}), 400
-
-    with sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True) as conn:
-        cursor = conn.cursor()
-        result = cursor.execute(
-            "SELECT id, username, role FROM users WHERE id = ?",
-            (user_id,),
-        ).fetchall()
-
-    return jsonify({"query_type": "parameterized", "result": result})
-
-
-def validate_host(value: str) -> str | None:
-    try:
-        return str(ipaddress.ip_address(value))
+        ipaddress.ip_address(host)
+        return True
     except ValueError:
         pass
 
-    if not HOSTNAME_PATTERN.fullmatch(value):
-        return None
-    if ".." in value or value.startswith("-") or value.endswith("-"):
-        return None
-    return value
+    hostname_pattern = re.compile(
+        r"^(?=.{1,253}$)(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*$"
+    )
+
+    return bool(hostname_pattern.fullmatch(host))
 
 
 @app.route("/ping")
-def ping() -> Any:
-    host_raw = request.args.get("host", "127.0.0.1")
-    host = validate_host(host_raw)
-    if host is None:
-        return jsonify({"error": "invalid host"}), 400
+def ping():
+    host = request.args.get("host", "127.0.0.1")
 
-    try:
-        result = subprocess.run(
-            ["ping", "-c", "1", host],
-            shell=False,
-            capture_output=True,
-            text=True,
-            timeout=3,
-            check=False,
-        )
-    except subprocess.TimeoutExpired:
-        return jsonify({"error": "ping timed out"}), 504
+    if not is_valid_host(host):
+        return jsonify({
+            "error": "Invalid host. Only valid IP addresses or hostnames are allowed."
+        }), 400
 
-    return jsonify({"returncode": result.returncode, "stdout": result.stdout, "stderr": result.stderr})
+    result = subprocess.run(
+        ["ping", "-c", "1", host],
+        shell=False,
+        capture_output=True,
+        text=True,
+        timeout=5
+    )
+
+    safe_output = escape(result.stdout + "\n" + result.stderr)
+
+    return Response(f"<pre>{safe_output}</pre>", mimetype="text/html")
 
 
 @app.route("/hello")
-def hello() -> str:
-    name = request.args.get("name", "guest")[:80]
-    return f"<h1>Hello {html.escape(name)}</h1>"
+def hello():
+    name = request.args.get("name", "guest")
+    safe_name = escape(name)
+
+    return Response(f"<h1>Hello {safe_name}</h1>", mimetype="text/html")
 
 
 if __name__ == "__main__":
-    debug_mode = os.getenv("FLASK_DEBUG", "false").lower() == "true"
-    app.run(host="0.0.0.0", port=5000, debug=debug_mode)
+    app.run(host="0.0.0.0", port=5000, debug=False)

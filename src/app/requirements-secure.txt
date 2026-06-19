@@ -1,5 +1,2 @@
-# Hardened dependency baseline for remediation/retest mode.
-# Keep src/app/requirements.txt as intentionally vulnerable lab evidence if needed.
-Flask>=3.1.3
-requests>=2.32.4
-gunicorn>=22.0.0
+Flask==3.1.3
+gunicorn==23.0.0
