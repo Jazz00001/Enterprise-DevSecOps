@@ -1,0 +1,43 @@
+name: Gitleaks Secret Scan
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gitleaks:
+    name: Secret scanning gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks secret scan
+        run: |
+          mkdir -p security/reports
+          docker run --rm \
+            -v "$PWD:/repo" \
+            zricethezav/gitleaks:latest \
+            detect \
+            --source=/repo \
+            --redact \
+            --verbose \
+            --report-format=json \
+            --report-path=/repo/security/reports/gitleaks-report.json
+
+      - name: Upload Gitleaks report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-report
+          path: security/reports/gitleaks-report.json
+          if-no-files-found: warn

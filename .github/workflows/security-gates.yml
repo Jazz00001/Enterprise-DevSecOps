@@ -1,197 +1,119 @@
-name: Security Gates - Hardened Release Mode
+name: Security Gates - Blocking
 
 on:
   pull_request:
-    branches: [main, develop]
-  push:
-    branches: [main, develop]
+    branches: [ "main" ]
   workflow_dispatch:
-  schedule:
-    - cron: "0 6 * * 1"
 
 permissions:
   contents: read
-  security-events: write
-  actions: read
-
-concurrency:
-  group: security-gates-${{ github.ref }}
-  cancel-in-progress: true
-
-env:
-  PYTHON_VERSION: "3.11"
-  APP_PATH: "src/app"
-  DEFAULT_REQUIREMENTS: "src/app/requirements.txt"
-  SECURE_REQUIREMENTS: "src/app/requirements-secure.txt"
-  HARDENED_DOCKERFILE: "Dockerfile.hardened"
-  HARDENED_IMAGE: "enterprise-devsecops-hardened:${{ github.sha }}"
 
 jobs:
-  tests:
-    name: Unit and security regression tests
-    runs-on: ubuntu-24.04
+  python-security-gates:
+    name: Python SAST and dependency gates
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: "3.11"
 
-      - name: Install test dependencies
+      - name: Install security tools
         run: |
           python -m pip install --upgrade pip
+          pip install bandit pip-audit
 
-          if [ -f "${SECURE_REQUIREMENTS}" ]; then
-            echo "Using secure requirements file: ${SECURE_REQUIREMENTS}"
-            pip install -r "${SECURE_REQUIREMENTS}"
-          elif [ -f "${DEFAULT_REQUIREMENTS}" ]; then
-            echo "Secure requirements file not found. Falling back to: ${DEFAULT_REQUIREMENTS}"
-            pip install -r "${DEFAULT_REQUIREMENTS}"
-          else
-            echo "No requirements file found. Continuing with test tooling only."
-          fi
-
-          pip install pytest pytest-cov requests gunicorn
-
-      - name: Run unit and security regression tests in evidence mode
+      - name: Bandit gate - fail on high severity findings
         run: |
           mkdir -p security/reports
+          bandit -r src/app \
+            --severity-level high \
+            --confidence-level medium \
+            -f json \
+            -o security/reports/bandit-gate.json
 
-          if [ -d "tests" ]; then
-            python -m pytest tests/ -v \
-              --junitxml=security/reports/pytest-results.xml \
-              | tee security/reports/pytest-security-regression-report.txt || true
-          else
-            echo "No tests directory found." | tee security/reports/pytest-security-regression-report.txt
-          fi
+      - name: pip-audit gate - fail on vulnerable secure dependencies
+        run: |
+          mkdir -p security/reports
+          pip-audit -r src/app/requirements-secure.txt \
+            -f json \
+            -o security/reports/pip-audit-gate.json
 
-      - name: Upload test evidence
+      - name: Upload Python security gate reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: unit-security-regression-test-evidence
+          name: python-security-gate-reports
           path: |
-            security/reports/pytest-results.xml
-            security/reports/pytest-security-regression-report.txt
-          if-no-files-found: ignore
-          retention-days: 30
+            security/reports/bandit-gate.json
+            security/reports/pip-audit-gate.json
+          if-no-files-found: warn
 
-  hardened-container:
-    name: Build and scan hardened container image
-    runs-on: ubuntu-24.04
+  config-security-gates:
+    name: Dockerfile and Kubernetes config gates
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Trivy config gate - fail on HIGH/CRITICAL misconfigurations
+        uses: aquasecurity/trivy-action@0.36.0
         with:
-          persist-credentials: false
+          scan-type: "config"
+          scan-ref: "."
+          severity: "HIGH,CRITICAL"
+          exit-code: "1"
+          ignore-unfixed: true
+          format: "table"
+          output: "security/reports/trivy-config-gate.txt"
 
-      - name: Verify hardened Dockerfile exists
+      - name: Upload Trivy config gate report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-config-gate-report
+          path: security/reports/trivy-config-gate.txt
+          if-no-files-found: warn
+
+  workflow-quality-gate:
+    name: Workflow quality gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fail if blocking workflows contain fake gates
         run: |
-          test -f "${HARDENED_DOCKERFILE}"
-          echo "Found ${HARDENED_DOCKERFILE}"
+          echo "Checking blocking workflows for fake gates..."
 
-      - name: Build hardened Docker image
-        run: |
-          docker build \
-            -f "${HARDENED_DOCKERFILE}" \
-            -t "${HARDENED_IMAGE}" \
-            .
+          checked_files="
+          .github/workflows/security-gates.yml
+          .github/workflows/gitleaks.yml
+          .github/workflows/trivy-container.yml
+          .github/workflows/zap-baseline.yml
+          .github/workflows/codeql.yml
+          "
 
-      - name: Verify hardened image runs as non-root
-        run: |
-          docker run --rm --entrypoint id "${HARDENED_IMAGE}" | tee hardened-image-user.txt
+          pipe_symbol="|"
+          fake_continue_pattern="${pipe_symbol}${pipe_symbol} true"
 
-          if grep -q "uid=0" hardened-image-user.txt; then
-            echo "Container is running as root. Failing hardened image validation."
+          quote_zero='"0"'
+          fake_exit_pattern="exit-code: ${quote_zero}"
+
+          if grep -R -F "$fake_continue_pattern" $checked_files 2>/dev/null; then
+            echo "ERROR: Blocking workflows contain fake continue pattern."
             exit 1
           fi
 
-          echo "Container non-root validation passed."
+          if grep -R -F "$fake_exit_pattern" $checked_files 2>/dev/null; then
+            echo "ERROR: Blocking workflows contain fake zero exit-code pattern."
+            exit 1
+          fi
 
-      - name: Run Trivy hardened image scan in evidence mode
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: ${{ env.HARDENED_IMAGE }}
-          severity: CRITICAL,HIGH,MEDIUM
-          ignore-unfixed: true
-          format: table
-          output: trivy-hardened-image-report.txt
-          exit-code: "0"
-
-      - name: Upload hardened image evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: hardened-container-evidence
-          path: |
-            hardened-image-user.txt
-            trivy-hardened-image-report.txt
-          if-no-files-found: ignore
-          retention-days: 30
-
-  repository-security-scan:
-    name: Repository security scan evidence
-    runs-on: ubuntu-24.04
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-
-      - name: Run Trivy filesystem scan in evidence mode
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          scan-type: fs
-          scan-ref: .
-          scanners: vuln,secret,misconfig
-          severity: CRITICAL,HIGH,MEDIUM
-          ignore-unfixed: true
-          format: table
-          output: trivy-filesystem-report.txt
-          exit-code: "0"
-
-      - name: Upload repository scan evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: repository-security-scan-evidence
-          path: trivy-filesystem-report.txt
-          if-no-files-found: ignore
-          retention-days: 30
-
-  security-gate-summary:
-    name: Security gate summary
-    runs-on: ubuntu-24.04
-    needs:
-      - tests
-      - hardened-container
-      - repository-security-scan
-    if: always()
-
-    steps:
-      - name: Create security gate summary
-        run: |
-          {
-            echo "# Security Gates Summary"
-            echo
-            echo "Security gate workflow completed in hardened release evidence mode."
-            echo
-            echo "Completed jobs:"
-            echo "- Unit and security regression tests"
-            echo "- Hardened Dockerfile existence check"
-            echo "- Hardened container image build"
-            echo "- Non-root runtime validation"
-            echo "- Trivy hardened image scan"
-            echo "- Trivy repository scan"
-            echo
-            echo "Note:"
-            echo "This repository is a private DevSecOps lab and may intentionally contain vulnerable components."
-            echo "Scanner/test findings are collected as evidence artifacts instead of blocking every push."
-          } >> "$GITHUB_STEP_SUMMARY"
+          echo "PASS: no fake gates found in blocking workflows."

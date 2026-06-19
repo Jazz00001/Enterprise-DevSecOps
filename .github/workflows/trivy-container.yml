@@ -1,0 +1,40 @@
+name: Trivy Container Gate
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  trivy-container:
+    name: Build hardened image and scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build hardened Docker image
+        run: |
+          docker build -f Dockerfile.hardened -t devsecops-app:hardened .
+
+      - name: Trivy image gate - fail on HIGH/CRITICAL vulnerabilities
+        uses: aquasecurity/trivy-action@0.36.0
+        with:
+          image-ref: "devsecops-app:hardened"
+          severity: "HIGH,CRITICAL"
+          ignore-unfixed: true
+          exit-code: "1"
+          format: "table"
+          output: "security/reports/trivy-container-gate.txt"
+
+      - name: Upload Trivy container report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-container-gate-report
+          path: security/reports/trivy-container-gate.txt
+          if-no-files-found: warn
