@@ -59,7 +59,7 @@ jobs:
           cosign sign --yes "$IMAGE_NAME"
 
       - name: Generate GitHub provenance attestation
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v4
         with:
           subject-name: ${{ env.IMAGE_NAME }}
           push-to-registry: true
