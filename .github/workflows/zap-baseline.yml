@@ -41,7 +41,7 @@ jobs:
           curl -sSf http://127.0.0.1:5000/health
 
       - name: ZAP baseline gate
-        uses: zaproxy/action-baseline@v0.14.0
+        uses: zaproxy/action-baseline@v0.15.0
         with:
           target: "http://127.0.0.1:5000"
           fail_action: true
